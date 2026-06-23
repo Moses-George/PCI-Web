@@ -1,0 +1,51 @@
+import type { SectionWithSampleUnits } from "@/types";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+export const sectionsApi = createApi({
+  reducerPath: "sectionsApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: `http://localhost:8000/`,
+  }),
+  tagTypes: ["Section"],
+  endpoints: (builder) => ({
+    createSection: builder.mutation({
+      query(payload) {
+        return {
+          url: "/sections",
+          method: "POST",
+          // credentials: "include",
+          body: payload,
+        };
+      },
+      invalidatesTags: ["Section"],
+    }),
+    getAllSections: builder.query({
+      query(param) {
+        return {
+          url: "/sections",
+          method: "GET",
+          params: param,
+        };
+      },
+      providesTags: [{ type: "Section", id: "LIST" }],
+    }),
+    getSingleSection: builder.query<SectionWithSampleUnits, string>({
+      query(section_id) {
+        return {
+          url: `/sections/${section_id}`,
+          method: "GET",
+          // params: param,
+        };
+      },
+      // invalidatesTags: [{ type: "Transactions", id: "LIST" }],
+    }),
+  }),
+});
+
+// update-display-pic
+
+export const {
+  useCreateSectionMutation,
+  useGetAllSectionsQuery,
+  useGetSingleSectionQuery,
+} = sectionsApi;

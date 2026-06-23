@@ -4,8 +4,8 @@ import Dashboard from "./pages/dashboard";
 import Networks from "./pages/networks";
 import Sections from "./pages/sections";
 import "./App.css";
-import SectionDetail from "./pages/section-detail";
-import NetworkDetail from "./pages/network-detail";
+import SectionDetail from "./pages/section-details/page";
+import NetworkDetail from "./pages/network-details/page";
 import Analytics from "./pages/analytics";
 import BudgetPlanner from "./pages/budgetplanner";
 
@@ -17,7 +17,7 @@ function App() {
     { path: "/networks/:networkId", element: <NetworkDetail /> },
     { path: "/sections", element: <Sections /> },
     {
-      path: "/networks/:networkId/sections/:id",
+      path: "/networks/:networkId/sections/:sectionId",
       element: <SectionDetail />,
     },
     { path: "/analytics", element: <Analytics /> },

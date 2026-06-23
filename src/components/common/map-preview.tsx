@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 // import { useEffect } from 'react';
 
 // Fix marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
 interface MapPreviewProps {
@@ -17,15 +20,22 @@ interface MapPreviewProps {
   zoom?: number;
   markers?: { lat: number; lng: number; label?: string }[];
   height?: string;
+  className?: string;
 }
 
-const MapPreview = ({ center, zoom = 13, markers = [], height = '300px' }: MapPreviewProps) => {
+const MapPreview = ({
+  center,
+  zoom = 13,
+  markers = [],
+  height = "300px",
+  className,
+}: MapPreviewProps) => {
   return (
     <MapContainer
       center={center}
       zoom={zoom}
-      style={{ height, width: '100%', borderRadius: '0.5rem' }}
-      className="z-0"
+      style={{ height, width: "100%" }}
+      className={`${className} z-[10]`}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

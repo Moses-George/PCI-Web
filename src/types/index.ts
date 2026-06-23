@@ -18,7 +18,7 @@
 
 export interface DistressInput {
   distressType: string; // e.g., "Alligator", "Pothole"
-  severity: 'L' | 'M' | 'H';
+  severity: "L" | "M" | "H";
   quantity: number; // Count or area
 }
 
@@ -50,14 +50,13 @@ export interface DistressInput {
 //   calculatedAt: string;
 // }
 
-
 export interface Network {
   id: string;
   name: string;
   description: string;
   coordinates: [number, number]; // [lat, lng]
-  totalSections: number;
-  createdAt: string;
+  total_sections: number;
+  created_at: string;
 }
 
 export interface Section {
@@ -66,34 +65,38 @@ export interface Section {
   name: string;
   description: string;
   coordinates: [number, number];
-  chainageStart: number;
-  chainageEnd: number;
+  chainage_start: number;
+  chainage_end: number;
   width: number;
   length: number;
-  pixelToMmFactor: number;
+  pixel_to_mm_factor: number;
   area: number;
-  sampleUnitCount: number;
-  createdAt: string;
+  sample_unit_count: number;
+  created_at: string;
+}
+
+export interface SectionWithSampleUnits extends Section {
+  sample_units: SampleUnit[] 
 }
 
 export interface SampleUnit {
   id: string;
-  sectionId: string;
+  section_id: string;
   name: string;
-  imageUrl: string; // original
-  predictedImageUrl?: string; // overlay
-  pixelToMmFactor: number; // overrides section
-  distressType: string;
-  severity: 'L' | 'M' | 'H';
-  potholeDepth?: number;
+  original_image: string; // original
+  predicted_image?: string; // overlay
+  pixel_to_mm_factor: number; // overrides section
+  distress_type: string;
+  severity: "low" | "medium" | "high";
+  pothole_depth?: number;
   note: string;
-  detectedDistresses: DetectedDistress[];
-  createdAt: string;
+  detections: DetectedDistress[];
+  created_at: string;
 }
 
 export interface DetectedDistress {
-  type: string;
-  severity: 'L' | 'M' | 'H';
+  distress_type: string;
+  severity: "low" | "medium" | "high";
   averageWidth: number;
   length: number;
   area: number;
@@ -104,7 +107,7 @@ export interface DetectedDistress {
 export interface PCIResult {
   sectionId: string;
   finalPci: number;
-  rating: 'Good' | 'Satisfactory' | 'Poor' | 'Very Poor' | 'Failed';
+  rating: "Good" | "Satisfactory" | "Poor" | "Very Poor" | "Failed";
   deductValues: number[];
   cdv: number;
   calculatedAt: string;

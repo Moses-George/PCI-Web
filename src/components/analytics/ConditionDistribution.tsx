@@ -6,7 +6,11 @@ import { useGetSectionsQuery } from "../../store/api/apiSlice";
 const ConditionDistribution: React.FC = () => {
   const { data: sections } = useGetSectionsQuery();
   if (!sections || sections.length === 0) {
-    return <p className="text-gray-400">No sections available.</p>;
+    return (
+      <div className="bg-white flex items-center justify-center font-jakarta p-4 rounded-xl shadow-sm border border-gray-200 w-full h-64">
+        <p className="text-gray-400">No sections available.</p>
+      </div>
+    );
   }
 
   // We need PCI for each section. In dummy we don't have per-section PCI stored, but we can compute from sample units or use random.
@@ -48,7 +52,7 @@ const ConditionDistribution: React.FC = () => {
   const series = [{ name: "Sections", data: Object.values(ratingCounts) }];
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 font-jakarta">
       <Chart options={options} series={series} type="bar" height={300} />
     </div>
   );

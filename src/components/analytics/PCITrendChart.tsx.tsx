@@ -15,12 +15,15 @@ const PCITrendChart: React.FC<PCITrendChartProps> = ({
   const data = historicalPCI[sectionId] || [];
   if (!data.length)
     return (
-      <p className="text-gray-400">No historical data for this section.</p>
+      <div className="flex items-center justify-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <p className="text-gray-400">No historical data for this section.</p>
+      </div>
     );
 
   // Prepare series
   const dates = data.map((d) => new Date(d.date).toLocaleDateString());
-  const pcis = data.map((d) => d.pci);
+  const pcis = data.map((d) => +d.pci.toFixed(2));
+  // console.log(pcis)
 
   // Simple linear regression for forecast
   const x = pcis.map((_, i) => i);
@@ -31,7 +34,7 @@ const PCITrendChart: React.FC<PCITrendChartProps> = ({
   const sumXY = x.reduce((a, b, i) => a + b * y[i], 0);
   const sumX2 = x.reduce((a, b) => a + b * b, 0);
   const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
+  const intercept = (+sumY - slope * sumX) / n;
   // forecast next N years
   const lastIndex = x.length - 1;
   const forecastPoints = [];
@@ -57,11 +60,14 @@ const PCITrendChart: React.FC<PCITrendChartProps> = ({
       title: { text: "PCI Score" },
       min: 0,
       max: 100,
+      labels: {
+        formatter: (val) => val.toFixed(2),
+      },
     },
     colors: ["#3b82f6", "#ef4444"],
     legend: { position: "top" },
     tooltip: {
-      y: { formatter: (val) => val.toFixed(0) },
+      y: { formatter: (val) => val.toFixed(2) },
     },
     annotations: {
       yaxis: [
@@ -87,7 +93,7 @@ const PCITrendChart: React.FC<PCITrendChartProps> = ({
 
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      <h4 className="font-medium mb-2">PCI Trend & Forecast</h4>
+      <h4 className="font-medium font-jakarta mb-2">PCI Trend & Forecast</h4>
       <Chart options={options} series={series} type="line" height={350} />
     </div>
   );

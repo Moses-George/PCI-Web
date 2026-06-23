@@ -14,7 +14,7 @@ const Header = () => {
         >
           <FiMenu size={24} />
         </button>
-        <h1 className="text-xl font-semibold text-gray-800">
+        <h1 className="text-xl font-jakarta font-semibold text-gray-800">
           Pavement Management Dashboard
         </h1>
       </div>
@@ -23,7 +23,7 @@ const Header = () => {
           className="text-gray-500 hover:text-gray-700 cursor-pointer"
           size={22}
         />
-        <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-medium">
+        <div className="w-8 h-8 rounded-full text-[13x] p-1 bg-blue-500 text-white flex items-center justify-center font-jakarta font-medium">
           PM
         </div>
       </div>
