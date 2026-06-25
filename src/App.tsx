@@ -1,7 +1,7 @@
 import { useRoutes } from "react-router-dom";
 import MainLayout from "./components/layouts/main-layout";
 import Dashboard from "./pages/dashboard";
-import Networks from "./pages/networks";
+import Networks from "./pages/networks/page";
 import Sections from "./pages/sections";
 import "./App.css";
 import SectionDetail from "./pages/section-details/page";

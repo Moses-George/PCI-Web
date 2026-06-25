@@ -1,4 +1,5 @@
-import type { SectionWithSampleUnits } from "@/types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Section, SectionWithSampleUnits } from "@/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const sectionsApi = createApi({
@@ -19,7 +20,7 @@ export const sectionsApi = createApi({
       },
       invalidatesTags: ["Section"],
     }),
-    getAllSections: builder.query({
+    getAllSections: builder.query<Section[], Record<string, any>>({
       query(param) {
         return {
           url: "/sections",
@@ -39,6 +40,27 @@ export const sectionsApi = createApi({
       },
       // invalidatesTags: [{ type: "Transactions", id: "LIST" }],
     }),
+    updateSection: builder.mutation({
+      query({ section_id, payload }) {
+        return {
+          url: `/sections/${section_id}`,
+          method: "PATCH",
+          // credentials: "include",
+          body: payload,
+        };
+      },
+      invalidatesTags: ["Section"],
+    }),
+    deleteSection: builder.mutation({
+      query(section_id) {
+        return {
+          url: `/sections/${section_id}`,
+          method: "DELETE",
+          // credentials: "include",
+        };
+      },
+      invalidatesTags: ["Section"],
+    }),
   }),
 });
 
@@ -48,4 +70,6 @@ export const {
   useCreateSectionMutation,
   useGetAllSectionsQuery,
   useGetSingleSectionQuery,
+  useUpdateSectionMutation,
+  useDeleteSectionMutation,
 } = sectionsApi;

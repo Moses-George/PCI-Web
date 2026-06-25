@@ -21,7 +21,7 @@ const GenerateReport = ({
   reportModalOpen: boolean;
   setReportModalOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
-    const [reportName, setReportName] = useState("");
+  const [reportName, setReportName] = useState("");
   const [reportOptions, setReportOptions] = useState<string[]>([]);
   const [generateReport, { isLoading: reportLoading }] =
     useGenerateReportMutation();

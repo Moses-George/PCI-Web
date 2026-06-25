@@ -38,6 +38,27 @@ export const networksApi = createApi({
       },
       // providesTags: [{ type: "Network", id: "LIST" }],
     }),
+    updateNetwork: builder.mutation({
+      query({ network_id, payload }) {
+        return {
+          url: `/networks/${network_id}`,
+          method: "PATCH",
+          // credentials: "include",
+          body: payload,
+        };
+      },
+      invalidatesTags: ["Network"],
+    }),
+    deleteNetwork: builder.mutation({
+      query(network_id) {
+        return {
+          url: `/networks/${network_id}`,
+          method: "DELETE",
+          // credentials: "include",
+        };
+      },
+      invalidatesTags: ["Network"],
+    }),
   }),
 });
 
@@ -45,4 +66,6 @@ export const {
   useCreateNetworkMutation,
   useGetAllNetworksQuery,
   useGetSingleNetworkQuery,
+  useUpdateNetworkMutation,
+  useDeleteNetworkMutation
 } = networksApi;
