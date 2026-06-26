@@ -76,7 +76,7 @@ export interface Section {
 }
 
 export interface SectionWithSampleUnits extends Section {
-  sample_units: SampleUnit[] 
+  sample_units: SampleUnit[];
 }
 
 export interface SampleUnit {
@@ -97,10 +97,12 @@ export interface SampleUnit {
 export interface DetectedDistress {
   distress_type: string;
   severity: "low" | "medium" | "high";
-  averageWidth: number;
-  length: number;
-  area: number;
-  perimeter: number;
+  metrics: {
+    avg_width: number;
+    length: number;
+    area: number;
+    perimeter: number;
+  };
   confidence: number;
 }
 
@@ -117,3 +119,5 @@ export interface PCIResult {
 export type DummyNetwork = Network;
 export type DummySection = Section;
 export type DummySampleUnit = SampleUnit;
+
+export type ActionType = "delete" | "edit" | null;

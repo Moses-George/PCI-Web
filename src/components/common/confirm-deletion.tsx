@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
+import { ClipLoader } from "react-spinners";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IConfirmationProps {
   confirmAction: any;
@@ -17,7 +20,7 @@ const ConfirmDeletion = ({
 }: IConfirmationProps) => {
   // const
   return (
-    <div className="flex justify-center items-center fixed inset-0 bg-[rgb(0,0,0,0.8)] bg-opacity-50 z-[9999]">
+    <div className="flex justify-center items-center fixed h-full inset-0 bg-[#7180967A] backdrop-blur-[1.5px] z-[9999]">
       <div className="bg-white px-4 py-6 rounded shadow-md md:w-[500px] z-[9999] space-y-10">
         <div className="space-y-2">
           <h1 className="lg:text-xxl text-lg text-gray-800 font-semibold">
@@ -34,12 +37,10 @@ const ConfirmDeletion = ({
           </button>
           <button
             onClick={confirmAction}
-            className="bg-red-600 py-2 px-6 text-sm shadow-md rounded-md text-white hover:opacity-75 transform active:scale-75 transition-transform cursor-pointer"
-            // bgColorClass="bg-blue-400"
-            // isLoading={loading}
-            // loadingMsg="processing..."
+            className="flex items-center gap-2 bg-red-600 py-2 px-6 text-sm shadow-md rounded-md text-white hover:opacity-75 transform active:scale-75 transition-transform cursor-pointer"
           >
-            Continue
+            {loading && <ClipLoader color="white" size={18} />}
+            <span className="">{loading ? "processing..." : "Continue"}</span>
           </button>
         </div>
       </div>

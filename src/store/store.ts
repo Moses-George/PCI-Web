@@ -4,10 +4,12 @@ import uiSlice from "./slices/uiSlice";
 import { networksApi } from "./api/networksApi";
 import { sectionsApi } from "./api/sectionsApi";
 import { sampleUnitApi } from "./api/sampleUnitApi";
+import sampleUnitSlice from "./slices/sampleUnitSlice";
 
 export const store = configureStore({
   reducer: {
     ui: uiSlice,
+    sampleUnit: sampleUnitSlice,
     [apiSlice.reducerPath]: apiSlice.reducer,
     [networksApi.reducerPath]: networksApi.reducer,
     [sectionsApi.reducerPath]: sectionsApi.reducer,

@@ -47,6 +47,7 @@ const NetworkDetail = () => {
   } = useGetSingleNetworkQuery(networkId!);
   // console.log("network", network);
   const sections = network?.sections;
+  console.log(sections)
 
   const [deleteSection, { isLoading: isDeleting }] = useDeleteSectionMutation();
 
@@ -57,7 +58,7 @@ const NetworkDetail = () => {
   const handleAction = (section: Section, action: ActionType) => {
     setSelectedSection({
       action,
-      sectionId: network.id,
+      sectionId: section.id,
       section: {
         name: section.name,
         description: section.description,

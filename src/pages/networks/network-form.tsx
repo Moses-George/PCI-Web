@@ -71,14 +71,6 @@ const NetworkForm = ({
     refetchNetworks();
   };
 
-  // useEffect(() => {
-  //   if (isCreateSuccess || isUpdateSuccess) {
-  //     reset();
-  //     setOpenForm(false);
-  //     refetchNetworks();
-  //   }
-  // }, [isCreateSuccess, isUpdateSuccess]);
-
   return (
     <>
       {openForm && createPortal(<Backdrop />, document.body)}

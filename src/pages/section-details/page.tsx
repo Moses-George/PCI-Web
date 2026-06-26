@@ -21,11 +21,6 @@ const SectionDetail = () => {
     isLoading,
     refetch,
   } = useGetSingleSectionQuery(sectionId!);
-  // const {
-  //   data: sampleUnits,
-  //   isLoading: unitsLoading,
-  //   refetch,
-  // } = useGetSampleUnitsBySectionQuery(sectionId!);
   const [triggerPCI, { data: pciResult, isLoading: pciLoading }] =
     useLazyCalculatePCIQuery();
 
@@ -151,7 +146,11 @@ const SectionDetail = () => {
       </div>
 
       {/* List of Sample Units */}
-      <SampleUnits isLoading={isLoading} sampleUnits={sampleUnits} />
+      <SampleUnits
+        isLoading={isLoading}
+        sampleUnits={sampleUnits}
+        refetch={refetch}
+      />
 
       {sampleUnits?.length !== 0 && (
         <MaintenanceRecommendations

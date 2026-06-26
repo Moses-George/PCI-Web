@@ -18,10 +18,6 @@ export const sampleUnitApi = createApi({
           method: "POST",
           // credentials: "include",
           body: payload,
-        //   headers: {
-        //     // Remove the default Content-Type so the browser adds the correct multipart boundary
-        //     "Content-Type": undefined,
-        //   },
         };
       },
       invalidatesTags: ["SampleUnit"],
@@ -35,8 +31,33 @@ export const sampleUnitApi = createApi({
       },
       providesTags: [{ type: "SampleUnit", id: "LIST" }],
     }),
+    updateSampleUnit: builder.mutation({
+      query({ sample_unit_id, payload }) {
+        return {
+          url: `sample-units/${sample_unit_id}`,
+          method: "PATCH",
+          // credentials: "include",
+          body: payload,
+        };
+      },
+      invalidatesTags: ["SampleUnit"],
+    }),
+    deleteSampleUnit: builder.mutation({
+      query(sample_unit_id) {
+        return {
+          url: `sample-units/${sample_unit_id}`,
+          method: "DELETE",
+          // credentials: "include",
+        };
+      },
+      invalidatesTags: ["SampleUnit"],
+    }),
   }),
 });
 
-export const { useCreateSampleUnitMutation, useGetSampleUnitsBySectionQuery } =
-  sampleUnitApi;
+export const {
+  useCreateSampleUnitMutation,
+  useGetSampleUnitsBySectionQuery,
+  useUpdateSampleUnitMutation,
+  useDeleteSampleUnitMutation,
+} = sampleUnitApi;

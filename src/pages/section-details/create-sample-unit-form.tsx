@@ -10,21 +10,20 @@ import {
   SheetTrigger,
   //   SheetClose,
 } from "@/components/ui/sheet";
-import { useCreateSampleUnitMutation } from "@/store/api/sampleUnitApi";
-import { useState } from "react";
+import {
+  useCreateSampleUnitMutation,
+  useUpdateSampleUnitMutation,
+} from "@/store/api/sampleUnitApi";
 import type { Section } from "@/types";
 import { toast } from "react-toastify";
 import { Plus } from "lucide-react";
-
-export interface SampleUnitForm {
-  name: string;
-  pixel_to_mm_factor: number;
-  distress_type: string;
-  severity: "low" | "medium" | "high";
-  pothole_depth?: number;
-  note: string;
-  image_file: FileList;
-}
+import { normalizeError } from "@/utils/helpers";
+import {
+  setOpenForm,
+  type ISampleUnitForm,
+} from "@/store/slices/sampleUnitSlice";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 const CreateSampleUnitForm = ({
   section,
@@ -35,63 +34,111 @@ const CreateSampleUnitForm = ({
   sectionId: string | undefined;
   refetch: any;
 }) => {
-  const [createSampleUnit, { isLoading: isCreating }] =
-    useCreateSampleUnitMutation();
-
-  const [openSheet, setOpenSheet] = useState(false);
+  const dispatch = useDispatch();
+  const {
+    openForm,
+    action,
+    sample_unit_id: selected_su_id,
+    sample_unit: selectedSampleUnit,
+  } = useSelector((state: RootState) => state.sampleUnit);
+  const isEditing = Boolean(selectedSampleUnit && action === "edit");
 
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
     watch,
-  } = useForm<SampleUnitForm>({
-    defaultValues: {
-      name: "",
-      pixel_to_mm_factor: section?.pixel_to_mm_factor || 0.5,
-      distress_type: "Pothole",
-      severity: "low",
-      pothole_depth: undefined,
-      note: "",
-    },
+  } = useForm<ISampleUnitForm>({
+    values: isEditing
+      ? { ...selectedSampleUnit }
+      : {
+          name: "",
+          pixel_to_mm_factor: section?.pixel_to_mm_factor || 0.5,
+          distress_type: null,
+          severity: null,
+          pothole_depth: 0,
+          note: "",
+        },
   });
-
   const distressType = watch("distress_type");
 
-  const onSubmit = async (data: SampleUnitForm) => {
-    if (!data.image_file || data.image_file.length === 0) {
-      toast.error("Please select an image");
+  const [createSampleUnit, { isLoading: isCreating }] =
+    useCreateSampleUnitMutation();
+  const [updateSampleUnit, { isLoading: isUpdating }] =
+    useUpdateSampleUnitMutation();
+
+  const onSubmit = async (data: ISampleUnitForm) => {
+    const formData = new FormData();
+    formData.append("name", data.name!);
+    formData.append("pixel_to_mm_factor", String(data.pixel_to_mm_factor));
+    formData.append("pothole_depth", String(data.pothole_depth));
+    formData.append("note", data.note!);
+
+    // ✅ Only append distress_type and severity if they are selected
+    if (data.distress_type && data.distress_type.trim()) {
+      formData.append("distress_type", data.distress_type.trim());
+      if (data.severity && data.severity.trim()) {
+        formData.append("severity", data.severity.trim());
+      }
+    }
+
+    // Append image only if a file is selected
+    if (data.image_file && data.image_file.length > 0) {
+      formData.append("image_file", data.image_file[0]);
+    }
+
+    // Now frontend validation: at least one of (image, distress_type) must be provided
+    const hasImage = data.image_file && data.image_file.length > 0;
+    const hasDistress = data.distress_type && data.distress_type.trim();
+    if (!hasImage && !hasDistress) {
+      toast.error(
+        "Please either select an image or specify distress type and severity.",
+      );
       return;
     }
-    const formData = new FormData();
-    formData.append("section_id", sectionId!);
-    formData.append("name", data.name);
-    formData.append("pixel_to_mm_factor", String(data.pixel_to_mm_factor));
-    formData.append("distress_type", data.distress_type);
-    formData.append("severity", data.severity);
-    formData.append("pothole_depth", String(data.pothole_depth));
-    formData.append("note", data.note);
-    formData.append("image_file", data.image_file[0]);
-    await createSampleUnit(formData).unwrap();
-    // await createSampleUnit({
-    //   section_id: sectionId!,
-    //   name: data.name,
-    //   pixel_to_mm_factor: data.pixel_to_mm_factor,
-    //   distress_type: data.distress_type,
-    //   severity: data.severity,
-    //   pothole_depth: data.pothole_depth,
-    //   note: data.note,
-    //   image_file: data.image_file[0],
-    // }).unwrap();
-    reset();
-    setOpenSheet(false);
-    refetch();
-    toast.success("Sample unit added");
+    if (hasDistress && !data.severity?.trim()) {
+      toast.error("Please select a severity level for the distress.");
+      return;
+    }
+
+    console.log("data", data);
+    const p = Object.fromEntries(formData);
+    console.log("formData", p);
+
+    try {
+      if (isEditing) {
+        await updateSampleUnit({
+          sample_unit_id: selected_su_id,
+          payload: formData,
+        }).unwrap();
+      } else {
+        formData.append("section_id", sectionId!);
+        await createSampleUnit(formData).unwrap();
+      }
+      reset();
+      dispatch(setOpenForm(false));
+      refetch();
+      toast.success(`Sample unit ${isEditing ? "updated" : "added"}`);
+    } catch (err) {
+      const normalized = normalizeError(err);
+      // Show a toast with the main error message
+      toast.error(normalized.message);
+      // If there are field‑specific errors, set them in React Hook Form
+      if (
+        normalized.fieldErrors &&
+        Object.keys(normalized.fieldErrors).length > 0
+      ) {
+        for (const [field, message] of Object.entries(normalized.fieldErrors)) {
+          setError(field as any, { type: "server", message });
+        }
+      }
+    }
   };
 
   return (
-    <Sheet open={openSheet} onOpenChange={setOpenSheet}>
+    <Sheet open={openForm} onOpenChange={(open) => dispatch(setOpenForm(open))}>
       <SheetTrigger asChild>
         <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
           <Plus size={18} /> Add Sample Unit
@@ -199,18 +246,28 @@ const CreateSampleUnitForm = ({
           <SheetFooter>
             <button
               type="button"
-              onClick={() => setOpenSheet(false)}
+              onClick={() => dispatch(setOpenForm(false))}
               className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={isCreating}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isCreating ? "Adding..." : "Add Sample Unit"}
-            </button>
+            {isEditing ? (
+              <button
+                type="submit"
+                disabled={isUpdating}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transform active:scale-75 transition-transform cursor-pointer"
+              >
+                {isUpdating ? "Updating..." : "Update Sample Unit"}
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={isCreating}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isCreating ? "Adding..." : "Add Sample Unit"}
+              </button>
+            )}
           </SheetFooter>
         </form>
       </SheetContent>
