@@ -90,7 +90,9 @@ export interface SampleUnit {
   severity: "low" | "medium" | "high";
   pothole_depth?: number;
   note: string;
+  inference_status: string;
   detections: DetectedDistress[];
+  images: Image[];
   created_at: string;
 }
 
@@ -104,6 +106,21 @@ export interface DetectedDistress {
     perimeter: number;
   };
   confidence: number;
+}
+
+export interface Image {
+  id: string;
+  sample_unit_id: string;
+  public_url: string;
+  cloudinary_public_id: string;
+  original_filename: string;
+  mime_type: string;
+  size_bytes: number;
+  width: number | null;
+  height: number | null;
+  format: string | null;
+  is_original: boolean;
+  is_annotated: boolean;
 }
 
 export interface PCIResult {

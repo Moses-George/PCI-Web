@@ -17,6 +17,7 @@ export interface ISampleUnitState {
   sample_unit: ISampleUnitForm | null;
   openForm: boolean;
   openDeleModal: boolean;
+  isScrollDown: boolean;
 }
 
 interface PayloadExtended extends SampleUnit {
@@ -29,6 +30,7 @@ const initialState: ISampleUnitState = {
   sample_unit: null,
   openForm: false,
   openDeleModal: false,
+  isScrollDown: false,
 };
 
 const sampleUnitSlice = createSlice({
@@ -47,15 +49,28 @@ const sampleUnitSlice = createSlice({
         note: actionObj.payload.note,
       };
     },
+    resetSelectedSUAction: (state) => {
+      state.action = null;
+      state.sample_unit_id = null;
+      state.sample_unit = null;
+    },
     setOpenForm: (state, action: PayloadAction<boolean>) => {
       state.openForm = action.payload;
     },
     setOpenDeleModal: (state, action: PayloadAction<boolean>) => {
       state.openDeleModal = action.payload;
     },
+    setScrollDown: (state, action) => {
+      state.isScrollDown = action.payload;
+    },
   },
 });
 
-export const { setSelectedSUAction, setOpenForm, setOpenDeleModal } =
-  sampleUnitSlice.actions;
+export const {
+  setSelectedSUAction,
+  resetSelectedSUAction,
+  setOpenForm,
+  setOpenDeleModal,
+  setScrollDown,
+} = sampleUnitSlice.actions;
 export default sampleUnitSlice.reducer;

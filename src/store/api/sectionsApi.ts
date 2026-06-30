@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Section, SectionWithSampleUnits } from "@/types";
+import type { SampleUnit, Section, SectionWithSampleUnits } from "@/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const sectionsApi = createApi({
@@ -40,6 +40,16 @@ export const sectionsApi = createApi({
       },
       // invalidatesTags: [{ type: "Transactions", id: "LIST" }],
     }),
+    getSingleSectionSampleUnits: builder.query<SampleUnit[], string>({
+      query(section_id) {
+        return {
+          url: `/sections/${section_id}/sample-units`,
+          method: "GET",
+          // params: param,
+        };
+      },
+      // invalidatesTags: [{ type: "Transactions", id: "LIST" }],
+    }),
     updateSection: builder.mutation({
       query({ section_id, payload }) {
         return {
@@ -70,6 +80,7 @@ export const {
   useCreateSectionMutation,
   useGetAllSectionsQuery,
   useGetSingleSectionQuery,
+  useGetSingleSectionSampleUnitsQuery,
   useUpdateSectionMutation,
   useDeleteSectionMutation,
 } = sectionsApi;

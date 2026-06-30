@@ -3,30 +3,41 @@ import { useParams } from "react-router-dom";
 import { useLazyCalculatePCIQuery } from "@/store/api/apiSlice";
 import Spinner from "@/components/common/spinner";
 import MapPreview from "@/components/common/map-preview";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Calculator, FileText, MapPin, Ruler, Calendar } from "lucide-react";
 import { toast } from "react-toastify";
 import MaintenanceRecommendations from "@/components/maintenance/MaintenanceRecommendations";
 import CreateSampleUnitForm from "./create-sample-unit-form";
 import GenerateReport from "./generate-report";
-import { useGetSingleSectionQuery } from "@/store/api/sectionsApi";
+import {
+  useGetSingleSectionQuery,
+  useGetSingleSectionSampleUnitsQuery,
+} from "@/store/api/sectionsApi";
 import SampleUnits from "./sample-units";
 
 const SectionDetail = () => {
   const { sectionId } = useParams<{
     sectionId: string;
   }>();
+  const { data: section } = useGetSingleSectionQuery(sectionId!);
   const {
-    data: section,
-    isLoading,
+    data: sampleUnits,
+    isLoading: isLoadingSU,
     refetch,
-  } = useGetSingleSectionQuery(sectionId!);
+  } = useGetSingleSectionSampleUnitsQuery(sectionId!);
+
   const [triggerPCI, { data: pciResult, isLoading: pciLoading }] =
     useLazyCalculatePCIQuery();
 
-  const sampleUnits = section?.sample_units;
-
   const [reportModalOpen, setReportModalOpen] = useState(false);
+  const firstSampleUnitRef = useRef<HTMLDivElement>(null);
+
+  const scrollToFirst = () => {
+    firstSampleUnitRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   const handleCalculatePCI = async () => {
     await triggerPCI(sectionId!).unwrap();
@@ -93,6 +104,7 @@ const SectionDetail = () => {
             section={section}
             sectionId={sectionId}
             refetch={refetch}
+            onSuccess={scrollToFirst}
           />
         </div>
       </div>
@@ -147,9 +159,10 @@ const SectionDetail = () => {
 
       {/* List of Sample Units */}
       <SampleUnits
-        isLoading={isLoading}
+        isLoading={isLoadingSU}
         sampleUnits={sampleUnits}
         refetch={refetch}
+        scrollToFirstRef={firstSampleUnitRef}
       />
 
       {sampleUnits?.length !== 0 && (

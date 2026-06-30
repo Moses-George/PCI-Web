@@ -19,20 +19,24 @@ import { toast } from "react-toastify";
 import { Plus } from "lucide-react";
 import { normalizeError } from "@/utils/helpers";
 import {
+  resetSelectedSUAction,
   setOpenForm,
   type ISampleUnitForm,
 } from "@/store/slices/sampleUnitSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+// import { useEffect } from "react";
 
 const CreateSampleUnitForm = ({
   section,
   sectionId,
   refetch,
+  onSuccess,
 }: {
   section: Section | undefined;
   sectionId: string | undefined;
   refetch: any;
+  onSuccess?: () => void;
 }) => {
   const dispatch = useDispatch();
   const {
@@ -40,6 +44,7 @@ const CreateSampleUnitForm = ({
     action,
     sample_unit_id: selected_su_id,
     sample_unit: selectedSampleUnit,
+    // isScrollDown
   } = useSelector((state: RootState) => state.sampleUnit);
   const isEditing = Boolean(selectedSampleUnit && action === "edit");
 
@@ -62,7 +67,7 @@ const CreateSampleUnitForm = ({
           note: "",
         },
   });
-  const distressType = watch("distress_type");
+  const distressType = watch("distress_type", null);
 
   const [createSampleUnit, { isLoading: isCreating }] =
     useCreateSampleUnitMutation();
@@ -120,6 +125,7 @@ const CreateSampleUnitForm = ({
       reset();
       dispatch(setOpenForm(false));
       refetch();
+      if (!isEditing) setTimeout(() => onSuccess?.(), 300);
       toast.success(`Sample unit ${isEditing ? "updated" : "added"}`);
     } catch (err) {
       const normalized = normalizeError(err);
@@ -140,11 +146,18 @@ const CreateSampleUnitForm = ({
   return (
     <Sheet open={openForm} onOpenChange={(open) => dispatch(setOpenForm(open))}>
       <SheetTrigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <button
+          onClick={() => dispatch(resetSelectedSUAction())}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform active:scale-75 transition-transform cursor-pointer"
+        >
           <Plus size={18} /> Add Sample Unit
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full max-w-md overflow-y-auto">
+      <SheetContent
+        side="right"
+        onCloseAutoFocus={(e) => e.preventDefault()}
+        className="w-full max-w-md overflow-y-auto"
+      >
         <SheetHeader>
           <SheetTitle>New Sample Unit</SheetTitle>
           <SheetDescription>
@@ -247,7 +260,7 @@ const CreateSampleUnitForm = ({
             <button
               type="button"
               onClick={() => dispatch(setOpenForm(false))}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transform active:scale-75 transition-transform cursor-pointer"
             >
               Cancel
             </button>
@@ -263,7 +276,7 @@ const CreateSampleUnitForm = ({
               <button
                 type="submit"
                 disabled={isCreating}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transform active:scale-75 transition-transform cursor-pointer"
               >
                 {isCreating ? "Adding..." : "Add Sample Unit"}
               </button>
