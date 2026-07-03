@@ -206,7 +206,7 @@ const CreateSampleUnitForm = ({
               <option value="Alligator Crack">Alligator Crack</option>
               <option value="Longitudinal Crack">Longitudinal Crack</option>
               <option value="Transverse Crack">Transverse Crack</option>
-              <option value="Rutting">Rutting</option>
+              {/* <option value="Rutting">Rutting</option> */}
             </select>
           </div>
           <div>

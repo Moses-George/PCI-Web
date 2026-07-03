@@ -1,10 +1,9 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "./base";
 
 export const networksApi = createApi({
   reducerPath: "networksApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `http://localhost:8000/`,
-  }),
+  baseQuery: baseQueryWithAuth,
   tagTypes: ["Network"],
   endpoints: (builder) => ({
     createNetwork: builder.mutation({
@@ -67,5 +66,5 @@ export const {
   useGetAllNetworksQuery,
   useGetSingleNetworkQuery,
   useUpdateNetworkMutation,
-  useDeleteNetworkMutation
+  useDeleteNetworkMutation,
 } = networksApi;

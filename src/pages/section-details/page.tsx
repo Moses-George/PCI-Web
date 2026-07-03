@@ -86,7 +86,7 @@ const SectionDetail = () => {
             <button
               onClick={handleCalculatePCI}
               disabled={pciLoading}
-              className="flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transform active:scale-75 transition-transform cursor-pointer"
             >
               <Calculator size={18} />{" "}
               {pciLoading ? "Calculating..." : "Calculate PCI"}
@@ -95,7 +95,7 @@ const SectionDetail = () => {
           {sampleUnits?.length !== 0 && (
             <button
               onClick={() => setReportModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              className="flex items-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transform active:scale-75 transition-transform cursor-pointer"
             >
               <FileText size={18} /> Generate Report
             </button>

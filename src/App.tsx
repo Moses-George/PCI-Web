@@ -8,6 +8,9 @@ import SectionDetail from "./pages/section-details/page";
 import NetworkDetail from "./pages/network-details/page";
 import Analytics from "./pages/analytics";
 import BudgetPlanner from "./pages/budgetplanner";
+import Auth from "./components/common/auth";
+import { useSelector } from "react-redux";
+import type { RootState } from "./store/store";
 
 function App() {
   const elements = useRoutes([
@@ -23,6 +26,10 @@ function App() {
     { path: "/analytics", element: <Analytics /> },
     { path: "/budget-planner", element: <BudgetPlanner /> },
   ]);
+
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  if (!isAuthenticated) return <Auth />;
 
   return <MainLayout>{elements}</MainLayout>;
 

@@ -12,6 +12,7 @@ import { ChevronUp, ChevronDown, Trash2, Edit } from "lucide-react";
 import { useInferenceStatus } from "@/hooks/useInferenceStatus";
 import { InferenceProgress } from "@/components/common/Inference-progress";
 import type { RootState } from "@/store/store";
+import SUImages from "./su-image";
 
 const SampleUnitCard = ({
   sample_unit,
@@ -30,11 +31,6 @@ const SampleUnitCard = ({
 
   const [selectedSUExplorer, setSelectedSUExplorer] =
     useState<SampleUnit | null>(null);
-
-  // Track annotated image — may arrive after initial render via WS
-  const [annotatedUrl, setAnnotatedUrl] = useState<string | null>(
-    sample_unit?.images?.find((img) => img.is_annotated)?.public_url ?? null,
-  );
 
   // Only open WS if inference isn't already terminal
   const isTerminal = ["done", "failed"].includes(sample_unit.inference_status);
@@ -56,11 +52,6 @@ const SampleUnitCard = ({
       setSelectedSUExplorer(sample_unit);
     }
   };
-
-  const original_image = sample_unit?.images?.find((img) => img.is_original);
-  const predicted_image =
-    sample_unit?.images?.find((img) => img.is_annotated) ??
-    (annotatedUrl ? { public_url: annotatedUrl } : null);
 
   const handleAction = (sample_unit: SampleUnit, action: ActionType) => {
     dispatch(setSelectedSUAction({ action, ...sample_unit }));
@@ -116,53 +107,7 @@ const SampleUnitCard = ({
             <span className="text-sm">Edit</span>
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative">
-            <p className="text-sm font-medium text-gray-600 mb-1">
-              Original Image
-            </p>
-            {original_image ? (
-              <img
-                src={original_image?.public_url}
-                alt="Original"
-                className="w-full rounded-lg border border-gray-200 max-h-64 object-cover"
-              />
-            ) : (
-              <div className="w-full h-64 px-4 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
-                No Image was selected for this sample unit. Click Edit to add an
-                image. Note: Sample units without images have no predictions.
-                Manual values selected by user is used during computation
-              </div>
-            )}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-600 mb-1">
-              Predicted Image
-            </p>
-            {predicted_image ? (
-              <img
-                src={predicted_image?.public_url}
-                alt="Predicted"
-                className="w-full rounded-lg border border-gray-200 max-h-64 object-cover"
-              />
-            ) : (
-              <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
-                {event?.status === "processing" ? (
-                  <div className="flex flex-col items-center gap-2 text-blue-400">
-                    <span className="animate-spin text-2xl">⏳</span>
-                    <span className="text-xs">
-                      {event.detail ?? "Analysing..."}
-                    </span>
-                  </div>
-                ) : original_image ? (
-                  "No Detection from BBOX Model"
-                ) : (
-                  "Not processed yet"
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+        <SUImages images={sample_unit?.images} event={event} />
         <button
           onClick={() => toggleExplorer(sample_unit)}
           className="w-full flex items-center justify-center gap-2 py-3 mb-4 border text-sm text-gray-700 hover:bg-gray-50 transition cursor-pointer"
@@ -194,8 +139,9 @@ const SampleUnitCard = ({
                         <th className="px-3 py-2 text-left">Avg Width (mm)</th>
                         <th className="px-3 py-2 text-left">Length (mm)</th>
                         <th className="px-3 py-2 text-left">Area (mm²)</th>
-                        <th className="px-3 py-2 text-left">Perimeter (mm)</th>
+                        {/* <th className="px-3 py-2 text-left">Perimeter (mm)</th> */}
                         <th className="px-3 py-2 text-left">Confidence (%)</th>
+                        <th className="px-3 py-2 text-left">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -208,7 +154,7 @@ const SampleUnitCard = ({
                             {detection?.severity ?? "Null"}
                           </td>
                           <td className="px-3 py-2">
-                            {detection?.metrics.avg_width ?? "Null"}
+                            {detection?.metrics.avg_width.toFixed(2) ?? "Null"}
                           </td>
                           <td className="px-3 py-2">
                             {detection?.metrics?.length ?? "Null"}
@@ -217,10 +163,21 @@ const SampleUnitCard = ({
                             {detection?.metrics?.area ?? "Null"}
                           </td>
                           <td className="px-3 py-2">
-                            {detection?.metrics?.perimeter ?? "Null"}
-                          </td>
-                          <td className="px-3 py-2">
                             {(detection?.confidence * 100).toFixed(0)}%
+                          </td>
+                          <td className="px-3 py-2 flex items-center gap-3">
+                            <button className="flex items-center gap-1 transform active:scale-75 transition-transform cursor-pointer">
+                              <Edit size={12} color="blue" />
+                              <span className="text-[12px] font-medium">
+                                Edit
+                              </span>
+                            </button>
+                            <button className="flex items-center gap-1 transform active:scale-75 transition-transform cursor-pointer">
+                              <Trash2 size={12} color="red" />
+                              <span className="text-[12px] font-medium">
+                                Delete
+                              </span>
+                            </button>
                           </td>
                         </tr>
                       ))}

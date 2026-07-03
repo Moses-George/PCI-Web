@@ -71,6 +71,16 @@ export const sectionsApi = createApi({
       },
       invalidatesTags: ["Section"],
     }),
+    calcSectionPCI: builder.mutation({
+      query(section_id) {
+        return {
+          url: `/sections/${section_id}/calc-pci`,
+          method: "DELETE",
+          // credentials: "include",
+        };
+      },
+      invalidatesTags: ["Section"],
+    }),
   }),
 });
 
