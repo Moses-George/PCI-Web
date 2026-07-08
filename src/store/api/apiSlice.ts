@@ -1,10 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Network, Section, SampleUnit, PCIResult } from "../../types";
-import {
-  dummyNetworks,
-  dummySections,
-  dummySampleUnits,
-} from "../../constants/dummy";
+
 
 const isDummy = true; // toggle to false when real backend is ready
 
@@ -16,10 +12,10 @@ export const apiSlice = createApi({
     // Networks
     getNetworks: builder.query<Network[], void>({
       queryFn: async (_arg, _api, _extraOptions, baseQuery) => {
-        if (!isDummy) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          return { data: dummyNetworks };
-        }
+        // if (!isDummy) {
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+        //   return { data: dummyNetworks };
+        // }
         const result = await baseQuery({ url: "/networks" });
         if (result.error) return { error: result.error };
         return { data: result.data as Network[] };
@@ -28,19 +24,19 @@ export const apiSlice = createApi({
     }),
     createNetwork: builder.mutation<Network, Partial<Network>>({
       queryFn: async (body, _api, _extraOptions, baseQuery) => {
-        if (!isDummy) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          const newNetwork: Network = {
-            id: `n${Date.now()}`,
-            name: body.name || "New Network",
-            description: body.description || "",
-            coordinates: body.coordinates || [0, 0],
-            total_sections: 0,
-            created_at: new Date().toISOString(),
-          };
-          dummyNetworks.push(newNetwork);
-          return { data: newNetwork };
-        }
+        // if (!isDummy) {
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+        //   const newNetwork: Network = {
+        //     id: `n${Date.now()}`,
+        //     name: body.name || "New Network",
+        //     description: body.description || "",
+        //     coordinates: body.coordinates || [0, 0],
+        //     total_sections: 0,
+        //     created_at: new Date().toISOString(),
+        //   };
+        //   dummyNetworks.push(newNetwork);
+        //   return { data: newNetwork };
+        // }
         const result = await baseQuery({
           url: "/networks",
           method: "POST",
@@ -55,10 +51,10 @@ export const apiSlice = createApi({
     // Sections
     getSections: builder.query<Section[], void>({
       queryFn: async (_arg, _api, _extraOptions, baseQuery) => {
-        if (isDummy) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          return { data: dummySections };
-        }
+        // if (isDummy) {
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+        //   return { data: dummySections };
+        // }
         const result = await baseQuery({ url: "/sections" });
         if (result.error) return { error: result.error };
         return { data: result.data as Section[] };
@@ -67,12 +63,12 @@ export const apiSlice = createApi({
     }),
     getSectionsByNetwork: builder.query<Section[], string>({
       queryFn: async (networkId, _api, _extraOptions, baseQuery) => {
-        if (!isDummy) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          return {
-            data: dummySections.filter((s) => s.networkId === networkId),
-          };
-        }
+        // if (!isDummy) {
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+        //   return {
+        //     data: dummySections.filter((s) => s.networkId === networkId),
+        //   };
+        // }
         const result = await baseQuery({
           url: `/networks/${networkId}`,
         });
@@ -86,28 +82,28 @@ export const apiSlice = createApi({
       { networkId: string; data: Partial<Section> }
     >({
       queryFn: async ({ networkId, data }, _api, _extraOptions, baseQuery) => {
-        if (!isDummy) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          const newSection: Section = {
-            id: `s${Date.now()}`,
-            networkId,
-            name: data.name || "New Section",
-            description: data.description || "",
-            coordinates: data.coordinates || [0, 0],
-            chainage_start: data.chainage_start || 0,
-            chainage_end: data.chainage_end || 1,
-            width: data.width || 10,
-            length: data.length || 1,
-            pixel_to_mm_factor: data.pixel_to_mm_factor || 0.5,
-            area: (data.length || 1) * (data.width || 10) * 1000,
-            sample_unit_count: 0,
-            created_at: new Date().toISOString(),
-          };
-          dummySections.push(newSection);
-          const network = dummyNetworks.find((n) => n.id === networkId);
-          if (network) network.total_sections += 1;
-          return { data: newSection };
-        }
+        // if (!isDummy) {
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+        //   const newSection: Section = {
+        //     id: `s${Date.now()}`,
+        //     networkId,
+        //     name: data.name || "New Section",
+        //     description: data.description || "",
+        //     coordinates: data.coordinates || [0, 0],
+        //     chainage_start: data.chainage_start || 0,
+        //     chainage_end: data.chainage_end || 1,
+        //     width: data.width || 10,
+        //     length: data.length || 1,
+        //     pixel_to_mm_factor: data.pixel_to_mm_factor || 0.5,
+        //     area: (data.length || 1) * (data.width || 10) * 1000,
+        //     sample_unit_count: 0,
+        //     created_at: new Date().toISOString(),
+        //   };
+        //   dummySections.push(newSection);
+        //   const network = dummyNetworks.find((n) => n.id === networkId);
+        //   if (network) network.total_sections += 1;
+        //   return { data: newSection };
+        // }
         const result = await baseQuery({
           url: `/sections`,
           method: "POST",
@@ -123,12 +119,12 @@ export const apiSlice = createApi({
     // Sample Units
     getSampleUnitsBySection: builder.query<SampleUnit[], string>({
       queryFn: async (sectionId, _api, _extraOptions, baseQuery) => {
-        if (isDummy) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          return {
-            data: dummySampleUnits.filter((su) => su.section_id === sectionId),
-          };
-        }
+        // if (isDummy) {
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+        //   return {
+        //     data: dummySampleUnits.filter((su) => su.section_id === sectionId),
+        //   };
+        // }
         const result = await baseQuery({
           url: `/sections/${sectionId}/sample-units`,
         });
@@ -145,27 +141,29 @@ export const apiSlice = createApi({
       }
     >({
       queryFn: async ({ sectionId, data }, _api, _extraOptions, baseQuery) => {
-        if (isDummy) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          const newUnit: SampleUnit = {
-            id: `su${Date.now()}`,
-            section_id: sectionId,
-            name: data.name || `SU-${dummySampleUnits.length + 1}`,
-            original_image: URL.createObjectURL(data.imageFile),
-            predicted_image: undefined,
-            pixel_to_mm_factor: data.pixel_to_mm_factor || 0.5,
-            distress_type: data.distress_type || "Unknown",
-            severity: data.severity || "low",
-            pothole_depth: data.pothole_depth,
-            note: data.note || "",
-            detections: [],
-            created_at: new Date().toISOString(),
-          };
-          dummySampleUnits.push(newUnit);
-          const section = dummySections.find((s) => s.id === sectionId);
-          if (section) section.sample_unit_count += 1;
-          return { data: newUnit };
-        }
+        // if (isDummy) {
+        //   await new Promise((resolve) => setTimeout(resolve, 500));
+        //   const newUnit: SampleUnit = { 
+        //     id: `su${Date.now()}`,
+        //     section_id: sectionId,
+        //     name: data.name || `SU-${dummySampleUnits.length + 1}`,
+        //     original_image: URL.createObjectURL(data.imageFile),
+        //     predicted_image: undefined,
+        //     pixel_to_mm_factor: data.pixel_to_mm_factor || 0.5,
+        //     distress_type: data.distress_type || "Unknown",
+        //     severity: data.severity || "low",
+        //     pothole_depth: data.pothole_depth,
+        //     note: data.note || "",
+        //     detections: [],
+        //     images: [],
+        //     inference_status: "done",
+        //     created_at: new Date().toISOString(),
+        //   };
+        //   dummySampleUnits.push(newUnit);
+        //   const section = dummySections.find((s) => s.id === sectionId);
+        //   if (section) section.sample_unit_count += 1;
+        //   return { data: newUnit };
+        // }
         const formData = new FormData();
         Object.entries(data).forEach(([key, val]) => {
           if (key !== "imageFile") formData.append(key, String(val));

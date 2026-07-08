@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCreateSectionMutation } from "@/store/api/apiSlice";
+import {
+  useCreateSectionMutation,
+  useUpdateSectionMutation,
+} from "@/store/api/sectionsApi";
 import {
   Sheet,
   SheetContent,
@@ -50,6 +53,7 @@ const CreateSectionForm = ({
   setSelectedSection: Dispatch<SetStateAction<ISelectedSection>>;
 }) => {
   const [createSection, { isLoading: isCreating }] = useCreateSectionMutation();
+  const [updateSection, { isLoading: isUpdating }] = useUpdateSectionMutation();
   // const [open, setOpen] = useState(false);
 
   const {
@@ -74,19 +78,46 @@ const CreateSectionForm = ({
   });
 
   const onSubmit = async (data: SectionForm) => {
-    await createSection({
-      networkId: networkId!,
-      data: {
-        name: data.name,
-        description: data.description,
-        coordinates: [data.lat, data.lng],
-        chainage_start: +data.chainageStart.toFixed(2),
-        chainage_end: +data.chainageEnd.toFixed(2),
-        width: +data.width.toFixed(2),
-        length: +data.length.toFixed(2),
-        pixel_to_mm_factor: +data.pixelToMmFactor.toFixed(2),
-      },
-    }).unwrap();
+    // const p = Object.fromEntries(formData);
+    console.log("formData", data);
+    // await createSection({
+    //   networkId: networkId!,
+    //   data: {
+    //     name: data.name,
+    //     description: data.description,
+    //     coordinates: [data.lat, data.lng],
+    //     chainage_start: +data.chainageStart.toFixed(2),
+    //     chainage_end: +data.chainageEnd.toFixed(2),
+    //     width: +data.width.toFixed(2),
+    //     length: +data.length.toFixed(2),
+    //     pixel_to_mm_factor: +data.pixelToMmFactor.toFixed(2),
+    //   },
+    // }).unwrap();
+    // reset();
+    // setOpenForm(false);
+    // refetchNetwork();
+
+    const payload = {
+      name: data.name,
+      description: data.description,
+      coordinates: [data.lat, data.lng],
+      chainage_start: +data.chainageStart.toFixed(2),
+      chainage_end: +data.chainageEnd.toFixed(2),
+      width: +data.width.toFixed(2),
+      length: +data.length.toFixed(2),
+      pixel_to_mm_factor: +data.pixelToMmFactor.toFixed(2),
+    };
+    if (isEditing) {
+      await updateSection({
+        section_id: selectedSection.sectionId,
+        payload,
+      }).unwrap();
+    } else {
+      await createSection({
+        networkId: networkId!,
+        data: payload,
+      }).unwrap();
+    }
     reset();
     setOpenForm(false);
     refetchNetwork();
@@ -115,7 +146,11 @@ const CreateSectionForm = ({
           className="w-full max-w-md overflow-y-auto z-[99999] font-jakarta"
         >
           <SheetHeader>
-            <SheetTitle>New Section in {network?.name}</SheetTitle>
+            <SheetTitle>
+              {isEditing
+                ? `Edit ${selectedSection?.section?.name} Section in ${network?.name}`
+                : `New Section in ${network?.name}`}
+            </SheetTitle>
             <SheetDescription>
               Enter section details. Coordinates default to network location.
             </SheetDescription>
@@ -265,7 +300,7 @@ const CreateSectionForm = ({
               {isEditing ? (
                 <button
                   type="submit"
-                  disabled={isCreating}
+                  disabled={isUpdating}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transform active:scale-75 transition-transform cursor-pointer"
                 >
                   {isCreating ? "Updating..." : "Update Section"}

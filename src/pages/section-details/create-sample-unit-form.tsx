@@ -25,7 +25,9 @@ import {
 } from "@/store/slices/sampleUnitSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-// import { useEffect } from "react";
+import { useState } from "react";
+
+const VISION_MODELS = ["Segmentation", "Bounding Box"];
 
 const CreateSampleUnitForm = ({
   section,
@@ -39,6 +41,7 @@ const CreateSampleUnitForm = ({
   onSuccess?: () => void;
 }) => {
   const dispatch = useDispatch();
+  const [model, setModel] = useState<string>("Bounding Box");
   const {
     openForm,
     action,
@@ -92,6 +95,7 @@ const CreateSampleUnitForm = ({
     // Append image only if a file is selected
     if (data.image_file && data.image_file.length > 0) {
       formData.append("image_file", data.image_file[0]);
+      formData.append("model_to_use", model)
     }
 
     // Now frontend validation: at least one of (image, distress_type) must be provided
@@ -159,9 +163,11 @@ const CreateSampleUnitForm = ({
         className="w-full max-w-md overflow-y-auto"
       >
         <SheetHeader>
-          <SheetTitle>New Sample Unit</SheetTitle>
+          <SheetTitle>
+            {isEditing ? "Edit Sample Unit" : "New Sample Unit"}
+          </SheetTitle>
           <SheetDescription>
-            Upload an image and provide distress details.
+            Upload an image or provide distress details.
           </SheetDescription>
         </SheetHeader>
         <form
@@ -180,20 +186,22 @@ const CreateSampleUnitForm = ({
               <p className="text-red-500 text-xs">{errors.name.message}</p>
             )}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Pixel to mm Factor (override)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              {...register("pixel_to_mm_factor", {
-                required: true,
-                valueAsNumber: true,
-              })}
-              className="mt-1 w-full px-3 py-2 border rounded-md"
-            />
-          </div>
+          {!isEditing && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Pixel to mm Factor (override)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                {...register("pixel_to_mm_factor", {
+                  required: true,
+                  valueAsNumber: true,
+                })}
+                className="mt-1 w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Distress Type
@@ -255,6 +263,25 @@ const CreateSampleUnitForm = ({
               {...register("image_file")}
               className="mt-1 w-full bg-gray-200 p-2 text-sm rounded-md cursor-pointer"
             />
+          </div>
+          <div className="space-y-2">
+            <p className="block text-sm font-medium text-gray-700">Model to use</p>
+            <div className="flex items-center gap-3">
+              {VISION_MODELS.map((opt) => (
+                <label
+                  key={opt}
+                  className="flex items-center gap-2 cursor-pointer select-none"
+                >
+                  <input
+                    type="checkbox"
+                    checked={model === opt}
+                    onChange={() => setModel(opt)}
+                    className="w-4 h-4 accent-indigo-600"
+                  />
+                  <span className="text-sm text-gray-700">{opt}</span>
+                </label>
+              ))}
+            </div>
           </div>
           <SheetFooter>
             <button

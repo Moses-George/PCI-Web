@@ -72,7 +72,11 @@ export interface Section {
   pixel_to_mm_factor: number;
   area: number;
   sample_unit_count: number;
-  created_at: string;
+  latest_pci: number | null;
+  latest_rating: string | null;
+  is_calculated: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface SectionWithSampleUnits extends Section {
@@ -97,15 +101,34 @@ export interface SampleUnit {
 }
 
 export interface DetectedDistress {
+  id: string;
   distress_type: string;
   severity: "low" | "medium" | "high";
+  normalized_class?: string;
+  severity_label?: string;
   metrics: {
-    avg_width: number;
-    length: number;
-    area: number;
-    perimeter: number;
+    avg_width?: number;
+    length?: number;
+    area?: number;
+    perimeter?: number;
+    astm_quantity?: number;
+    astm_unit?: string;
+    pothole_equiv_diameter_mm?: number;
+    pothole_depth_est_mm?: number;
+    pothole_count?: number;
+
+    crack_category_confidence?: number;
+    orientation_deg?: number;
+    bbox_area_mm2?: number;
+    branch_density?: number;
+    loop_count?: number;
+    shape_complexity?: number;
+
+    texture_cv?: number;
+    // severity_metrics:
   };
   confidence: number;
+  edited: boolean;
 }
 
 export interface Image {
@@ -123,13 +146,28 @@ export interface Image {
   is_annotated: boolean;
 }
 
-export interface PCIResult {
-  sectionId: string;
-  finalPci: number;
-  rating: "Good" | "Satisfactory" | "Poor" | "Very Poor" | "Failed";
-  deductValues: number[];
-  cdv: number;
-  calculatedAt: string;
+// types/index.ts
+export interface PCIObservation {
+  distress_type: string;
+  severity: string;
+  density: number;
+  count: number;
+  deduct_value: number;
+}
+
+export interface PCIHistoryResponse {
+  id: string;
+  section_id: string;
+  final_pci: number;
+  condition_rating: string;
+  max_cdv: number;
+  tdv_start: number;
+  deduct_values: number[];
+  observations: PCIObservation[];
+  all_cdvs: number[];
+  all_tdvs: number[];
+  created_at: string;
+  updated_at: string | null;
 }
 
 // Dummy data types

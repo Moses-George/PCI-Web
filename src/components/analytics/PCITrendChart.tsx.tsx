@@ -1,74 +1,74 @@
 import React from "react";
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
-import { historicalPCI } from "../../constants/dummy";
+import { useGetPCITrendQuery } from "@/store/api/analyticsApi";
+import Spinner from "@/components/common/spinner";
 
-interface PCITrendChartProps {
+interface Props {
   sectionId: string;
   forecastYears?: number;
 }
 
-const PCITrendChart: React.FC<PCITrendChartProps> = ({
-  sectionId,
-  forecastYears = 2,
-}) => {
-  const data = historicalPCI[sectionId] || [];
-  if (!data.length)
+const PCITrendChart: React.FC<Props> = ({ sectionId, forecastYears = 1 }) => {
+  const { data, isLoading } = useGetPCITrendQuery(sectionId);
+
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-        <p className="text-gray-400">No historical data for this section.</p>
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-center h-64">
+        <Spinner size={25} />
       </div>
     );
-
-  // Prepare series
-  const dates = data.map((d) => new Date(d.date).toLocaleDateString());
-  const pcis = data.map((d) => +d.pci.toFixed(2));
-  // console.log(pcis)
-
-  // Simple linear regression for forecast
-  const x = pcis.map((_, i) => i);
-  const y = pcis;
-  const n = x.length;
-  const sumX = x.reduce((a, b) => a + b, 0);
-  const sumY = y.reduce((a, b) => a + b, 0);
-  const sumXY = x.reduce((a, b, i) => a + b * y[i], 0);
-  const sumX2 = x.reduce((a, b) => a + b * b, 0);
-  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (+sumY - slope * sumX) / n;
-  // forecast next N years
-  const lastIndex = x.length - 1;
-  const forecastPoints = [];
-  for (let i = 1; i <= forecastYears * 12; i++) {
-    const newX = lastIndex + i;
-    forecastPoints.push({ x: newX, y: Math.max(0, slope * newX + intercept) });
   }
 
+  if (!data || data?.length === 0) {
+    return (
+      <div className="bg-white h-full p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-center h-64">
+        <p className="text-gray-400 font-jakarta text-sm">
+          No PCI history yet. Calculate PCI to see trend data.
+        </p>
+      </div>
+    );
+  }
+
+  const dates = data.map((d) => new Date(d.date).toLocaleDateString());
+  const pcis = data.map((d) => +d.pci.toFixed(2));
+
+  // Linear regression forecast
+  const n = pcis?.length;
+  const x = pcis.map((_, i) => i);
+  const sumX = x.reduce((a, b) => a + b, 0);
+  const sumY = pcis.reduce((a, b) => a + b, 0);
+  const sumXY = x.reduce((a, _, i) => a + i * pcis[i], 0);
+  const sumX2 = x.reduce((a, b) => a + b * b, 0);
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  const forecastMonths = forecastYears * 12;
+  const forecastDates = Array.from({ length: forecastMonths }, (_, i) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + i + 1);
+    return d.toLocaleDateString();
+  });
+  const forecastValues = Array.from({ length: forecastMonths }, (_, i) =>
+    +Math.max(0, slope * (n + i) + intercept).toFixed(2)
+  );
+
   const options: ApexOptions = {
-    chart: {
-      type: "line",
-      height: 350,
-      toolbar: { show: true },
-      animations: { enabled: true },
-    },
-    stroke: { curve: "smooth", width: 3 },
-    markers: { size: 4 },
+    chart: { type: "line", toolbar: { show: true }, animations: { enabled: true } },
+    stroke: { curve: "smooth", width: [3, 2], dashArray: [0, 6] },
+    markers: { size: [4, 0] },
     xaxis: {
-      categories: [...dates, ...forecastPoints.map((_, i) => `+${i + 1}m`)],
-      title: { text: "Time" },
+      categories: [...dates, ...forecastDates],
+      title: { text: "Date" },
+      tickAmount: 8,
     },
     yaxis: {
       title: { text: "PCI Score" },
       min: 0,
       max: 100,
-      labels: {
-        formatter: (val) => val.toFixed(2),
-      },
     },
     colors: ["#3b82f6", "#ef4444"],
     legend: { position: "top" },
-    tooltip: {
-      y: { formatter: (val) => val.toFixed(2) },
-    },
     annotations: {
       yaxis: [
         {
@@ -78,16 +78,14 @@ const PCITrendChart: React.FC<PCITrendChartProps> = ({
         },
       ],
     },
+    tooltip: { y: { formatter: (v) => v.toFixed(1) } },
   };
 
   const series = [
     { name: "Historical PCI", data: pcis },
     {
       name: "Forecast",
-      data: [
-        ...Array(pcis.length).fill(null),
-        ...forecastPoints.map((p) => p.y),
-      ],
+      data: [...Array(pcis?.length).fill(null), ...forecastValues],
     },
   ];
 

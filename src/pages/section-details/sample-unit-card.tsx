@@ -13,13 +13,16 @@ import { useInferenceStatus } from "@/hooks/useInferenceStatus";
 import { InferenceProgress } from "@/components/common/Inference-progress";
 import type { RootState } from "@/store/store";
 import SUImages from "./su-image";
+import DetectionActionBtns from "./detection-action-btns";
 
 const SampleUnitCard = ({
   sample_unit,
   refetch,
+  refetchSection
 }: {
   sample_unit: SampleUnit;
   refetch: any;
+  refetchSection: any
 }) => {
   const dispatch = useDispatch();
   const {
@@ -96,18 +99,19 @@ const SampleUnitCard = ({
             onClick={() => handleAction(sample_unit, "delete")}
             className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
           >
-            <Trash2 size={24} color="red" />
+            <Trash2 size={20} color="red" />
             <span className="text-sm">Delete</span>
           </button>
           <button
             onClick={() => handleAction(sample_unit, "edit")}
             className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
           >
-            <Edit size={22} color="blue" />
+            <Edit size={20} color="blue" />
             <span className="text-sm">Edit</span>
           </button>
         </div>
         <SUImages images={sample_unit?.images} event={event} />
+        <p className="text-xs text-gray-400 mt-1 ">Note: {sample_unit.note}</p>
         <button
           onClick={() => toggleExplorer(sample_unit)}
           className="w-full flex items-center justify-center gap-2 py-3 mb-4 border text-sm text-gray-700 hover:bg-gray-50 transition cursor-pointer"
@@ -136,9 +140,11 @@ const SampleUnitCard = ({
                       <tr>
                         <th className="px-3 py-2 text-left">Type</th>
                         <th className="px-3 py-2 text-left">Severity</th>
-                        <th className="px-3 py-2 text-left">Avg Width (mm)</th>
-                        <th className="px-3 py-2 text-left">Length (mm)</th>
-                        <th className="px-3 py-2 text-left">Area (mm²)</th>
+                        <th className="px-3 py-2 text-left">Astm quantity</th>
+                        {/* <th className="px-3 py-2 text-left">Avg Width (mm) Astm quantity</th> */}
+                        {/* <th className="px-3 py-2 text-left">Length (mm)</th> */}
+                        <th className="px-3 py-2 text-left">Astm unit</th>
+                        {/* <th className="px-3 py-2 text-left">Area (mm²)</th> astm_unit */}
                         {/* <th className="px-3 py-2 text-left">Perimeter (mm)</th> */}
                         <th className="px-3 py-2 text-left">Confidence (%)</th>
                         <th className="px-3 py-2 text-left">Actions</th>
@@ -154,39 +160,33 @@ const SampleUnitCard = ({
                             {detection?.severity ?? "Null"}
                           </td>
                           <td className="px-3 py-2">
-                            {detection?.metrics.avg_width.toFixed(2) ?? "Null"}
+                            {detection?.metrics?.astm_quantity?.toFixed(2) ??
+                              "Null"}
                           </td>
                           <td className="px-3 py-2">
-                            {detection?.metrics?.length ?? "Null"}
+                            {detection?.metrics?.astm_unit ?? "Null"}
                           </td>
-                          <td className="px-3 py-2">
+                          {/* <td className="px-3 py-2">
                             {detection?.metrics?.area ?? "Null"}
-                          </td>
+                          </td> */}
                           <td className="px-3 py-2">
                             {(detection?.confidence * 100).toFixed(0)}%
                           </td>
                           <td className="px-3 py-2 flex items-center gap-3">
-                            <button className="flex items-center gap-1 transform active:scale-75 transition-transform cursor-pointer">
-                              <Edit size={12} color="blue" />
-                              <span className="text-[12px] font-medium">
-                                Edit
-                              </span>
-                            </button>
-                            <button className="flex items-center gap-1 transform active:scale-75 transition-transform cursor-pointer">
-                              <Trash2 size={12} color="red" />
-                              <span className="text-[12px] font-medium">
-                                Delete
-                              </span>
-                            </button>
+                            <DetectionActionBtns
+                              detection={detection}
+                              refetch={refetch}
+                              refetchSection={refetchSection}
+                            />
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
+                {/* <p className="text-xs text-gray-400 mt-1">
                   Note: {sample_unit.note}
-                </p>
+                </p> */}
               </div>
             )
           : selectedSUExplorer?.id === sample_unit?.id && (

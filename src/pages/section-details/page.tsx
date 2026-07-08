@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useParams } from "react-router-dom";
-import { useLazyCalculatePCIQuery } from "@/store/api/apiSlice";
 import Spinner from "@/components/common/spinner";
 import MapPreview from "@/components/common/map-preview";
 import { useRef, useState } from "react";
-import { Calculator, FileText, MapPin, Ruler, Calendar } from "lucide-react";
-import { toast } from "react-toastify";
+import { FileText, MapPin, Ruler, Calendar } from "lucide-react";
 import MaintenanceRecommendations from "@/components/maintenance/MaintenanceRecommendations";
 import CreateSampleUnitForm from "./create-sample-unit-form";
 import GenerateReport from "./generate-report";
@@ -14,20 +12,20 @@ import {
   useGetSingleSectionSampleUnitsQuery,
 } from "@/store/api/sectionsApi";
 import SampleUnits from "./sample-units";
+import PCIScoreCard from "./PCI-Score-Card";
 
 const SectionDetail = () => {
   const { sectionId } = useParams<{
     sectionId: string;
   }>();
-  const { data: section } = useGetSingleSectionQuery(sectionId!);
+  const { data: section, refetch: refetchSection } = useGetSingleSectionQuery(
+    sectionId!,
+  );
   const {
     data: sampleUnits,
     isLoading: isLoadingSU,
     refetch,
   } = useGetSingleSectionSampleUnitsQuery(sectionId!);
-
-  const [triggerPCI, { data: pciResult, isLoading: pciLoading }] =
-    useLazyCalculatePCIQuery();
 
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const firstSampleUnitRef = useRef<HTMLDivElement>(null);
@@ -39,16 +37,17 @@ const SectionDetail = () => {
     });
   };
 
-  const handleCalculatePCI = async () => {
-    await triggerPCI(sectionId!).unwrap();
-    toast.success("PCI calculated");
-  };
-
   const distressTypes =
     sampleUnits?.flatMap((su) =>
-      su?.detections?.map((detection) => detection.distress_type),
+      su?.detections?.length > 0
+        ? su?.detections?.map((detection) => detection.distress_type)
+        : su?.distress_type,
     ) || [];
-  const pci = pciResult?.finalPci || 50;
+
+  console.log("sec", section);
+
+  const pci = section?.latest_pci;
+  // const pci_rating = section?.latest_rating;
 
   if (!section)
     return (
@@ -82,16 +81,16 @@ const SectionDetail = () => {
           </div>
         </div>
         <div className="flex gap-3">
-          {sampleUnits?.length !== 0 && (
+          {/* {sampleUnits?.length !== 0 && (
             <button
               onClick={handleCalculatePCI}
-              disabled={pciLoading}
-              className="flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transform active:scale-75 transition-transform cursor-pointer"
+              disabled={pciLoading || section.is_calculated}
+              className={`flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transform active:scale-75 transition-transform cursor-pointer ${section.is_calculated || pciLoading ? "hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed" : ""}`}
             >
               <Calculator size={18} />{" "}
               {pciLoading ? "Calculating..." : "Calculate PCI"}
             </button>
-          )}
+          )} */}
           {sampleUnits?.length !== 0 && (
             <button
               onClick={() => setReportModalOpen(true)}
@@ -109,6 +108,35 @@ const SectionDetail = () => {
         </div>
       </div>
 
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+        <h4 className="font-medium mb-2">Model Recommendation</h4>
+        <div
+          className={`p-3 rounded-lg border bg-red-100 text-red-800 border-red-300`}
+        >
+          <div className="flex">
+            <div className="w-full">
+              <p className="font-semibold">Segmentation Model:</p>
+              <p className="text-[13px]">
+                Longitudinal Crack, Transverse Crack, Pothole.
+              </p>
+              <p className="text-[13px]">
+                Others: Alligator Crack (Not really recommended)
+              </p>
+            </div>
+            <div className="w-full">
+              <p className="font-semibold">Bounding Box Model:</p>
+              <p className="text-[13px]">
+                Pothole, Alligator Crack, Patching, Rutting, Edge Crack.
+              </p>
+              <p className="text-[13px]">
+                Others: Longitudinal Crack, Transverse Crack (Not really
+                recommended)
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Map and PCI result */}
       <div className="grid grid-cols-[6fr_4fr] gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -117,44 +145,16 @@ const SectionDetail = () => {
             <MapPreview
               center={section.coordinates}
               zoom={14}
-              height="360px"
+              height="100%"
               className="rounded-b-md h-full"
             />
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-center items-center">
-          {pciResult ? (
-            <div className="text-center">
-              <p className="text-sm text-gray-500">PCI Score</p>
-              <p className="text-5xl font-bold text-blue-600">
-                {pciResult.finalPci}
-              </p>
-              <p
-                className={`text-lg font-semibold mt-1 ${
-                  pciResult.rating === "Good"
-                    ? "text-green-600"
-                    : pciResult.rating === "Satisfactory"
-                      ? "text-blue-600"
-                      : pciResult.rating === "Poor"
-                        ? "text-yellow-600"
-                        : pciResult.rating === "Very Poor"
-                          ? "text-orange-600"
-                          : "text-red-600"
-                }`}
-              >
-                {pciResult.rating}
-              </p>
-              <p className="text-xs text-gray-400 mt-1">
-                Calculated: {new Date(pciResult.calculatedAt).toLocaleString()}
-              </p>
-            </div>
-          ) : (
-            <div className="text-gray-400 text-center">
-              <Calculator size={48} className="mx-auto mb-2" />
-              <p>Click "Calculate PCI" to get the section rating.</p>
-            </div>
-          )}
-        </div>
+        <PCIScoreCard
+          sectionId={sectionId}
+          refetchSection={refetchSection}
+          section={section}
+        />
       </div>
 
       {/* List of Sample Units */}
@@ -163,12 +163,13 @@ const SectionDetail = () => {
         sampleUnits={sampleUnits}
         refetch={refetch}
         scrollToFirstRef={firstSampleUnitRef}
+        refetchSection={refetchSection}
       />
 
-      {sampleUnits?.length !== 0 && (
+      {section?.latest_pci && (
         <MaintenanceRecommendations
           sectionId={sectionId!}
-          pci={pci}
+          pci={pci!}
           distressTypes={distressTypes}
         />
       )}

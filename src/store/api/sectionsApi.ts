@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { SampleUnit, Section, SectionWithSampleUnits } from "@/types";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type { PCIHistoryResponse, SampleUnit, Section, SectionWithSampleUnits } from "@/types";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "./base";
 
 export const sectionsApi = createApi({
   reducerPath: "sectionsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `http://localhost:8000/`,
-  }),
+  baseQuery: baseQueryWithAuth,
   tagTypes: ["Section"],
   endpoints: (builder) => ({
     createSection: builder.mutation({
@@ -71,15 +70,23 @@ export const sectionsApi = createApi({
       },
       invalidatesTags: ["Section"],
     }),
-    calcSectionPCI: builder.mutation({
+    calcSectionPCI: builder.query({
       query(section_id) {
         return {
-          url: `/sections/${section_id}/calc-pci`,
-          method: "DELETE",
+          url: `/sections/${section_id}/calc_pci`,
+          method: "GET",
           // credentials: "include",
         };
       },
-      invalidatesTags: ["Section"],
+    }),
+    getSectionPCIHistory: builder.query<PCIHistoryResponse[], string>({
+      query(section_id) {
+        return {
+          url: `/sections/${section_id}/pci_history`,
+          method: "GET",
+          // credentials: "include",
+        };
+      },
     }),
   }),
 });
@@ -93,4 +100,6 @@ export const {
   useGetSingleSectionSampleUnitsQuery,
   useUpdateSectionMutation,
   useDeleteSectionMutation,
+  useLazyCalcSectionPCIQuery,
+  useGetSectionPCIHistoryQuery
 } = sectionsApi;

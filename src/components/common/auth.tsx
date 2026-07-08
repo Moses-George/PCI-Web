@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { useAuthorizeUserMutation } from "@/store/api/auth";
+import { useAuthorizeUserMutation } from "@/store/api/authApi";
 import { setCredentials } from "@/store/slices/authSlice";
 import { normalizeError } from "@/utils/helpers";
 import { useForm } from "react-hook-form";
@@ -54,12 +54,12 @@ const Auth = () => {
   return (
     <div className="flex justify-center items-center fixed h-full inset-0 bg-[#7180967A] backdrop-blur-[1.5px] z-[9999]">
       <div className="bg-white px-8 py-6 rounded shadow-md md:w-[500px] z-[9999] space-y-6">
-        <div className="space-y-2">
+        <div className="space-y-">
           <h1 className="lg:text-xl text-lg text-gray-800 font-semibold">
-            System User Authorization is Reuired
+            System User Authorization is Required
           </h1>
           <p className="text-sm text-slate-500">
-            Please enter user email and pass to continue
+            Please enter user Email and Password to continue
           </p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">

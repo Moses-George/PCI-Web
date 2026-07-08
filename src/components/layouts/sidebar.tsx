@@ -40,8 +40,8 @@ const Sidebar = () => {
         ))}
       </nav>
       <div className="p-4 border-t border-gray-700 text-xs text-gray-400 font-jakarta font-medium">
-        <p className="">v1.0.0 • YOLO-seg</p>
-        <p className="">George Moses | All Rights Reserved</p>
+        <p className="">v1.0.0 • YOLO-seg • YOLO-bbox</p>
+        <p className=""> © George Moses | All Rights Reserved</p>
       </div>
     </aside>
   );

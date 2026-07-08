@@ -23,7 +23,7 @@ const SUImages = ({
 
   if (images?.length === 0) {
     return (
-      <div className="text-center w-full py-5 border-2 border-gray-300">
+      <div className="text-center w-full py-5  border-gray-300">
         <span className="text-gray-400">
           No Image is available for this sample unit
         </span>
@@ -39,7 +39,7 @@ const SUImages = ({
           <img
             src={original_image?.public_url}
             alt="Original"
-            className="w-full rounded-lg border border-gray-200 max-h-64 object-cover"
+            className="w-full rounded-lg border border-gray-200 h-64 object-cover"
           />
         ) : (
           <div className="w-full h-64 px-4 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
@@ -57,14 +57,14 @@ const SUImages = ({
           <img
             src={predicted_image?.public_url}
             alt="Predicted"
-            className="w-full rounded-lg border border-gray-200 max-h-64 object-cover"
+            className="w-full rounded-lg border border-gray-200 h-64 object-cover"
           />
         ) : (
           <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-sm">
             {event?.status === "processing" ? (
               <div className="flex flex-col items-center gap-2 text-blue-400">
-                {/* <span className="animate-spin text-2xl">⏳</span> */}
-                <GridLoader size={15} />
+                <span className="animate-spin text-2xl">⏳</span>
+                {/* <GridLoader size={15} /> */}
                 <span className="text-xs">
                   {event.detail ?? "Analysing..."}
                 </span>

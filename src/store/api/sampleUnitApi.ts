@@ -2,13 +2,12 @@
 
 // import type { SampleUnitForm } from "@/pages/section-details/create-sample-unit-form";
 import type { SampleUnit } from "@/types";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "./base";
 
 export const sampleUnitApi = createApi({
   reducerPath: "sampleUnitApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `http://localhost:8000/`,
-  }),
+  baseQuery: baseQueryWithAuth,
   tagTypes: ["SampleUnit"],
   endpoints: (builder) => ({
     createSampleUnit: builder.mutation<SampleUnit, FormData>({

@@ -89,3 +89,35 @@ export function normalizeError(error: unknown): NormalizedError {
     fieldErrors: {},
   };
 }
+
+const normalized_classes = {
+  "Alligator Crack": [
+    "alligator crack",
+    "Alligator crack",
+    "alligator cracking",
+    "alligator",
+  ],
+  "Transverse Crack": ["Transverse", "transverse cracking", "Transverse Crack"],
+  "Longitudinal Crack": [
+    "Longitudinal Crack",
+    "longitudinal cracking",
+    "Longitudinal",
+  ],
+  Pothole: ["Pothole"],
+  edge_crack: ["edge cracking", "edge crack"],
+  patching: ["patching"],
+  rutting: ["rutting"],
+};
+
+export const normalizeDistress = (distress_type: string) => {
+  for (const [key, values] of Object.entries(normalized_classes)) {
+    if (
+      values
+        .map((val) => val.toLowerCase())
+        .includes(distress_type?.toLowerCase())
+    ) {
+      return key;
+    }
+  }
+  return null;
+};

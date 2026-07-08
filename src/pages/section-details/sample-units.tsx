@@ -17,11 +17,13 @@ const SampleUnits = ({
   sampleUnits,
   refetch,
   scrollToFirstRef,
+  refetchSection,
 }: {
   isLoading: boolean;
   refetch: any;
   sampleUnits: SampleUnit[] | undefined;
   scrollToFirstRef?: React.RefObject<HTMLDivElement | null>;
+  refetchSection: any
 }) => {
   const dispatch = useDispatch();
 
@@ -38,7 +40,7 @@ const SampleUnits = ({
   const deleteSelectedSU = async () => {
     if (selected_su_id) {
       await deleteSampleUnit(selected_su_id).unwrap();
-      refetch();
+      await refetch();
       dispatch(setOpenDeleModal(false));
     } else {
       toast.warning(
@@ -61,7 +63,7 @@ const SampleUnits = ({
           closeModal={() => dispatch(setOpenDeleModal(false))}
           loading={isDeleting}
           header={"You're About to Delete a Sample Unit"}
-          message={`Are you sure you want to delete (${selectedSampleUnit?.name}) Sample Unit ? Please note that all model detections will also be deleted permanently. This action cannot be undone`}
+          message={`Are you sure you want to delete (${selectedSampleUnit?.name}) ? Please note that all model detections will also be deleted permanently. This action cannot be undone`}
         />
       )}
       <div className="space-y-4">
@@ -79,7 +81,7 @@ const SampleUnits = ({
         ) : (
           sampleUnits?.map((su, index) => (
             <div key={su.id} ref={index === 0 ? scrollToFirstRef : undefined}>
-              <SampleUnitCard sample_unit={su} refetch={refetch} />
+              <SampleUnitCard sample_unit={su} refetch={refetch} refetchSection={refetchSection} />
             </div>
           ))
         )}

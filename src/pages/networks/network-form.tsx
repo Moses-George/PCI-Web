@@ -91,9 +91,13 @@ const NetworkForm = ({
         </SheetTrigger>
         <SheetContent side="right" className="overflow-y-auto z-[99999]">
           <SheetHeader>
-            <SheetTitle>New Road Network</SheetTitle>
+            <SheetTitle>
+              {isEditing ? "Edit Road Network" : "New Road Network"}
+            </SheetTitle>
             <SheetDescription>
-              Fill in the details to create a new network.
+              {isEditing
+                ? `Fill in the details to update ${selectedNetwork.network?.name} (network)`
+                : "Fill in the details to create a new network."}
             </SheetDescription>
           </SheetHeader>
           <form

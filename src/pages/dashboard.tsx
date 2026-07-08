@@ -1,53 +1,4 @@
-// import { useGetNetworksQuery, useGetSectionsQuery } from '../store/api/apiSlice';
-// import Spinner from '../components/common/spinner';
-// import { Map, Grid, AlertTriangle, CheckCircle } from 'lucide-react';
-// // import { FiMap, FiGrid, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
-
-// const Dashboard = () => {
-//   const { data: networks, isLoading: netLoading } = useGetNetworksQuery();
-//   const { data: sections, isLoading: secLoading } = useGetSectionsQuery();
-
-//   if (netLoading || secLoading) return <div className="flex justify-center py-20"><Spinner /></div>;
-
-//   const stats = [
-//     { label: 'Total Networks', value: networks?.length || 0, icon: <Map />, color: 'bg-blue-500' },
-//     { label: 'Total Sections', value: sections?.length || 0, icon: <Grid />, color: 'bg-green-500' },
-//     { label: 'Sections with Issues', value: sections?.filter(s => s.sampleUnitCount > 0).length || 0, icon: <AlertTriangle />, color: 'bg-yellow-500' },
-//     { label: 'Analyzed Sections', value: sections?.filter(s => s.sampleUnitCount > 2).length || 0, icon: <CheckCircle />, color: 'bg-teal-500' },
-//   ];
-
-//   return (
-//     <div className="space-y-8">
-//       <h2 className="text-2xl font-bold font-jakarta">Dashboard Overview</h2>
-//       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-//         {stats.map((stat) => (
-//           <div key={stat.label} className="bg-white rounded-xl shadow-sm py-4 px-3 border border-gray-100 flex items-center gap-4">
-//             <div className={`${stat.color} p-2 rounded-full text-white`}>{stat.icon}</div>
-//             <div>
-//               <p className="text-gray-500 font-jakarta text-sm">{stat.label}</p>
-//               <p className="text-2xl font-jakarta font-bold">{stat.value}</p>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//       <div className="grid grid-cols-2 gap-6">
-//         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-400">
-//           🗺️ Global Map (Coming Soon)
-//         </div>
-//         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64 flex items-center justify-center text-gray-400">
-//           📊 PCI Distribution (Coming Soon)
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
-
-import {
-  useGetNetworksQuery,
-  useGetSectionsQuery,
-} from "../store/api/apiSlice";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Spinner from "../components/common/spinner";
 import {
   Map,
@@ -60,109 +11,77 @@ import {
 } from "lucide-react";
 import ConditionDistribution from "../components/analytics/ConditionDistribution";
 import ConditionHeatmap from "@/components/analytics/ConditionHeatmap";
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
-// import { dummySections } from '../constants/dummy';
-// import { ApexOptions } from 'apexcharts';
 import Chart from "react-apexcharts";
+import {
+  useGetDashboardStatsQuery,
+  useGetGlobalDistressDistributionQuery,
+  useGetRecentSampleUnitsQuery,
+} from "@/store/api/analyticsApi";
 
 const Dashboard = () => {
-  const { data: networks, isLoading: netLoading } = useGetNetworksQuery();
-  const { data: sections, isLoading: secLoading } = useGetSectionsQuery();
+  const { data: recentSampleUnits, isLoading: suIsLoading } =
+    useGetRecentSampleUnitsQuery();
+      console.log("recentSampleUnits", recentSampleUnits);
 
-  // For demonstration, we calculate average PCI from dummy data (or from real if available)
-  // In real app, you'd have a PCI field per section. We'll mock with random values.
-  // const rnd = Math.random()
-  const avgPci = useMemo(() => {
-    if (!sections) return 0;
-    const sum = sections.reduce((acc) => acc + Math.floor(9 * 50 + 40), 0);
-    return Math.round(sum / sections.length);
-  }, [sections]);
+  const { data: distress_dist } = useGetGlobalDistressDistributionQuery();
+  console.log("distress_dist", distress_dist);
+  const distresses = distress_dist?.map((dist) => dist.type);
+  const distresses_count = distress_dist?.map((dist) => dist.count);
 
-  const criticalSections = useMemo(() => {
-    if (!sections) return 0;
-    // assume PCI < 55 is critical
-    return sections.filter(() => 9 > 0.7).length; // mock
-  }, [sections]);
+  const { data: all_stats, isLoading: statIsLoading } =
+    useGetDashboardStatsQuery();
+  console.log("all_stats", all_stats);
+  // KPIs configuration
 
-  const totalSampleUnits = useMemo(() => {
-    if (!sections) return 0;
-    return sections.reduce((acc, s) => acc + s.sampleUnitCount, 0);
-  }, [sections]);
-
-  const recentSampleUnits = [
+  const stats = [
     {
-      id: "su1",
-      name: "SU-01",
-      section: "Section A",
-      date: "2024-06-18",
-      status: "Processed",
+      label: "Total Networks",
+      value: all_stats?.total_networks,
+      icon: <Map size={20} />,
+      color: "bg-blue-500",
     },
     {
-      id: "su2",
-      name: "SU-02",
-      section: "Section B",
-      date: "2024-06-17",
-      status: "Pending",
+      label: "Total Sections",
+      value: all_stats?.total_sections,
+      icon: <Grid size={20} />,
+      color: "bg-green-500",
     },
     {
-      id: "su3",
-      name: "SU-03",
-      section: "Section C",
-      date: "2024-06-16",
-      status: "Processing",
+      label: "Avg PCI",
+      value: all_stats?.avg_pci,
+      icon: <TrendingUp size={20} />,
+      color: "bg-purple-500",
+    },
+    {
+      label: "Critical Sections",
+      value: all_stats?.critical_sections,
+      icon: <AlertTriangle size={20} />,
+      color: "bg-red-500",
+    },
+    {
+      label: "Sample Units",
+      value: all_stats?.total_sample_units,
+      icon: <Activity size={20} />,
+      color: "bg-indigo-500",
+    },
+    {
+      label: "Analyzed Sections",
+      value: all_stats?.analyzed_sections,
+      icon: <CheckCircle size={20} />,
+      color: "bg-teal-500",
     },
   ];
 
-  if (netLoading || secLoading)
+  if (suIsLoading || statIsLoading)
     return (
       <div className="flex justify-center py-20">
         <Spinner />
       </div>
     );
 
-  // KPIs configuration
-  const stats = [
-    {
-      label: "Total Networks",
-      value: networks?.length || 0,
-      icon: <Map size={20} />,
-      color: "bg-blue-500",
-    },
-    {
-      label: "Total Sections",
-      value: sections?.length || 0,
-      icon: <Grid size={20} />,
-      color: "bg-green-500",
-    },
-    {
-      label: "Avg PCI",
-      value: avgPci,
-      icon: <TrendingUp size={20} />,
-      color: "bg-purple-500",
-    },
-    {
-      label: "Critical Sections",
-      value: criticalSections,
-      icon: <AlertTriangle size={20} />,
-      color: "bg-red-500",
-    },
-    {
-      label: "Sample Units",
-      value: totalSampleUnits,
-      icon: <Activity size={20} />,
-      color: "bg-indigo-500",
-    },
-    {
-      label: "Analyzed Sections",
-      value: sections?.filter((s) => s.sampleUnitCount > 2).length || 0,
-      icon: <CheckCircle size={20} />,
-      color: "bg-teal-500",
-    },
-  ];
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-jakarta ">
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
         <div className="flex justify-between items-center">
@@ -244,13 +163,7 @@ const Dashboard = () => {
           <Chart
             options={{
               chart: { type: "pie", height: 250 },
-              labels: [
-                "Pothole",
-                "Alligator Crack",
-                "Longitudinal Crack",
-                "Transverse Crack",
-                "Rutting",
-              ],
+              labels: distresses,
               colors: ["#ef4444", "#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"],
               legend: { position: "bottom" },
               dataLabels: {
@@ -258,7 +171,7 @@ const Dashboard = () => {
                 formatter: (val) => Number(val).toFixed(0) + "%",
               },
             }}
-            series={[25, 30, 20, 15, 10]}
+            series={distresses_count}
             type="pie"
             height={250}
           />
@@ -294,7 +207,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {recentSampleUnits.map((su) => (
+                {recentSampleUnits?.map((su) => (
                   <tr key={su.id} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-2">{su.name}</td>
                     <td className="px-4 py-2">{su.section}</td>
