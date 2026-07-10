@@ -59,6 +59,10 @@ export interface Network {
   created_at: string;
 }
 
+export interface NetworkWithSections extends Network {
+  sections: Section[];
+}
+
 export interface Section {
   id: string;
   networkId: string;

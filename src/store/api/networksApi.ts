@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./base";
+import type { NetworkWithSections } from "@/types";
 
 export const networksApi = createApi({
   reducerPath: "networksApi",
@@ -17,7 +18,7 @@ export const networksApi = createApi({
       },
       invalidatesTags: ["Network"],
     }),
-    getAllNetworks: builder.query({
+    getAllNetworks: builder.query<NetworkWithSections[], void>({
       query(param) {
         return {
           url: "/networks",
@@ -27,7 +28,7 @@ export const networksApi = createApi({
       },
       providesTags: [{ type: "Network", id: "LIST" }],
     }),
-    getSingleNetwork: builder.query({
+    getSingleNetwork: builder.query<NetworkWithSections, string | undefined>({
       query(network_id) {
         return {
           url: `/networks/${network_id}`,

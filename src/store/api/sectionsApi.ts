@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { PCIHistoryResponse, SampleUnit, Section, SectionWithSampleUnits } from "@/types";
+import type {
+  PCIHistoryResponse,
+  SampleUnit,
+  Section,
+  SectionWithSampleUnits,
+} from "@/types";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./base";
 
@@ -9,10 +15,13 @@ export const sectionsApi = createApi({
   tagTypes: ["Section"],
   endpoints: (builder) => ({
     createSection: builder.mutation({
-      query(payload) {
+      query({ network_id, payload }) {
         return {
           url: "/sections",
           method: "POST",
+          params: {
+            network_id,
+          },
           // credentials: "include",
           body: payload,
         };
@@ -101,5 +110,5 @@ export const {
   useUpdateSectionMutation,
   useDeleteSectionMutation,
   useLazyCalcSectionPCIQuery,
-  useGetSectionPCIHistoryQuery
+  useGetSectionPCIHistoryQuery,
 } = sectionsApi;

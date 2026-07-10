@@ -81,17 +81,17 @@ const EditDetection = ({
       <div className="bg-white px-8 py-6 rounded shadow-md md:w-[550px] z-[9999] space-y-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <h1 className="lg:text-xl text-lg text-gray-800 font-semibold">
+            <h1 className="text-lg text-gray-800 font-semibold">
               Edit Model's Distress Prediction
             </h1>
             {selectedDetection?.detection?.edited && (
-              <span className="bg-red-50 text-red-600 px-2 py-1">Edited</span>
+              <span className="bg-red-50 text-red-600 px-2 py-1 text-[12px]">Edited</span>
             )}
           </div>
-          <p className="text-sm text-slate-500">
+          <p className="text-[13px] text-slate-500">
             Only distres type and severity are editable, since they are the only
             parameters needed for PCI Estimation. Please do not fully rely on
-            model's prediction. adjust where necessary
+            model's prediction. Adjust where necessary
           </p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">

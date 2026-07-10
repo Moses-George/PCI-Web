@@ -63,6 +63,7 @@ const RATING_COLORS: Record<string, string> = {
 
 const ConditionDistribution: React.FC = () => {
   const { data, isLoading } = useGetPCIDistributionQuery(); 
+  console.log("pc dist", data)
 
   if (isLoading) {
     return (
@@ -82,9 +83,9 @@ const ConditionDistribution: React.FC = () => {
     );
   }
 
-  const categories = data.map((d) => d.rating);
-  const counts = data.map((d) => d.count);
-  const barColors = categories.map((r) => RATING_COLORS[r] ?? "#6b7280");
+  const categories = data?.map((d) => d.rating);
+  const counts = data?.map((d) => d.count);
+  const barColors = categories?.map((r) => RATING_COLORS[r] ?? "#6b7280");
 
   const options: ApexOptions = {
     chart: { type: "bar" },

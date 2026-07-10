@@ -74,7 +74,7 @@ const SampleUnitCard = ({
       >
         <div className="pb-4 border-b border-gray-100 flex justify-between items-center">
           <div>
-            <h4 className="font-semibold">{sample_unit.name}</h4>
+            <h4 className="font-semibold text-[15px]">{sample_unit.name}</h4>
             <div className="flex flex-wrap gap-3 text-xs text-gray-500">
               <span>Distress: {sample_unit.distress_type ?? "Null"}</span>
               <span>Severity: {sample_unit.severity ?? "Null"}</span>
@@ -94,20 +94,20 @@ const SampleUnitCard = ({
           onDone={(count) => console.log(`${count} detections ready`)}
         />
         <div className="flex items-center gap-3 font-jakarta mt-3">
-          <div className="font-bold text-sm">Actions:</div>
+          <div className="font-bold text-[14px]">Actions:</div>
           <button
             onClick={() => handleAction(sample_unit, "delete")}
             className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
           >
             <Trash2 size={20} color="red" />
-            <span className="text-sm">Delete</span>
+            <span className="text-[14px]">Delete</span>
           </button>
           <button
             onClick={() => handleAction(sample_unit, "edit")}
             className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
           >
             <Edit size={20} color="blue" />
-            <span className="text-sm">Edit</span>
+            <span className="text-[14px]">Edit</span>
           </button>
         </div>
         <SUImages images={sample_unit?.images} event={event} />

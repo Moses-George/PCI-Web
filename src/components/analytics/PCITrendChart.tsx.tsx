@@ -23,7 +23,7 @@ const PCITrendChart: React.FC<Props> = ({ sectionId, forecastYears = 1 }) => {
   if (!data || data?.length === 0) {
     return (
       <div className="bg-white h-full p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-center h-64">
-        <p className="text-gray-400 font-jakarta text-sm">
+        <p className="text-gray-400 font-jakarta text-[15px]">
           No PCI history yet. Calculate PCI to see trend data.
         </p>
       </div>
@@ -91,7 +91,7 @@ const PCITrendChart: React.FC<Props> = ({ sectionId, forecastYears = 1 }) => {
 
   return (
     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-      <h4 className="font-medium font-jakarta mb-2">PCI Trend & Forecast</h4>
+      <h4 className="font-medium font-jakarta mb-2 text-[16px]">PCI Trend & Forecast</h4>
       <Chart options={options} series={series} type="line" height={350} />
     </div>
   );

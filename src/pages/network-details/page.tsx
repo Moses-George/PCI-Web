@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Spinner from "../../components/common/spinner";
 import MapPreview from "../../components/common/map-preview";
 import CreateSectionForm from "./create-section-form";
-import { ArrowRight, Delete, Edit } from "lucide-react";
+import { ArrowRight, Edit, Trash2 } from "lucide-react";
 import { useGetSingleNetworkQuery } from "@/store/api/networksApi";
 import type { Section } from "@/types";
 import { useState } from "react";
@@ -47,7 +47,7 @@ const NetworkDetail = () => {
   } = useGetSingleNetworkQuery(networkId!);
   // console.log("network", network);
   const sections = network?.sections;
-  console.log(sections)
+  console.log(sections);
 
   const [deleteSection, { isLoading: isDeleting }] = useDeleteSectionMutation();
 
@@ -130,13 +130,13 @@ const NetworkDetail = () => {
 
         {/* Network Map & Analytics */}
         <div className="grid grid-cols-[6fr_4fr] gap-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <h4 className="font-medium p-4">Network Location</h4>
-            <div className="h-80">
+          <div className="bg-w rounded-xl shadow-sm border border-gray-200">
+            {/* <h4 className="font-medium p-4">Network Location</h4> */}
+            <div className="h-[25rem]">
               <MapPreview
                 center={network.coordinates}
                 zoom={11}
-                height="360px"
+                height="100%"
                 className="rounded-b-md h-full"
               />
             </div>
@@ -178,6 +178,12 @@ const NetworkDetail = () => {
                     ?.reduce((acc: number, s: Section) => acc + s.length, 0)
                     .toFixed(1) || 0}{" "}
                   m
+                </p>
+              </div>
+              <div className="bg-purple-50 p-3 rounded-lg">
+                <p className="text-sm text-gray-500">Sections Analyzed</p>
+                <p className="text-2xl font-bold">
+                  {sections?.filter((section) => section?.latest_pci).length}
                 </p>
               </div>
             </div>
@@ -228,14 +234,14 @@ const NetworkDetail = () => {
                     onClick={() => handleAction(sec, "delete")}
                     className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
                   >
-                    <Delete size={24} color="red" />
+                    <Trash2 size={20} color="red" />
                     <span className="text-sm">Delete</span>
                   </button>
                   <button
                     onClick={() => handleAction(sec, "edit")}
                     className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
                   >
-                    <Edit size={22} color="blue" />
+                    <Edit size={20} color="blue" />
                     <span className="text-sm">Edit</span>
                   </button>
                 </div>

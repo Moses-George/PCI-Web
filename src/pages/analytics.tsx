@@ -86,7 +86,7 @@ const Analytics: React.FC = () => {
 
   return (
     <div className="space-y-6 font-jakarta">
-      <h2 className="text-2xl font-jakarta font-bold">Analytics Dashboard</h2>
+      <h2 className="text-xl font-jakarta font-bold">Analytics Dashboard</h2>
 
       {/* Summary cards */}
       {summary && (
@@ -107,8 +107,8 @@ const Analytics: React.FC = () => {
               key={label}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 text-center"
             >
-              <p className="text-2xl font-bold text-blue-600">{value}</p>
-              <p className="text-sm text-gray-500 font-jakarta">{label}</p>
+              <p className="text-xl font-bold text-blue-600">{value}</p>
+              <p className="text-[14px] text-gray-500 font-jakarta">{label}</p>
             </div>
           ))}
         </div>
@@ -122,7 +122,7 @@ const Analytics: React.FC = () => {
         <select
           value={sectionId || ""}
           onChange={(e) => setSelectedSection(e.target.value)}
-          className="px-4 py-2 font-jakarta border rounded-lg bg-white shadow-md min-w-[90px]"
+          className="px-4 py-2 font-jakarta text-[14px] border rounded-lg bg-white shadow-md min-w-[90px]"
         >
           {sections?.map((s) => (
             <option key={s.id} value={s.id}>

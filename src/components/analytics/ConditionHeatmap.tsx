@@ -25,7 +25,7 @@ L.Icon.Default.mergeOptions({
 const createGeoJSON = (sections: any[], pciMap: Record<string, number>) => {
   return {
     type: "FeatureCollection",
-    features: sections.map((s) => {
+    features: sections?.map((s) => {
       const pci = pciMap[s.id] || 0;
       let color = "#22c55e"; // Good
       if (pci < 40) color = "#ef4444";
@@ -75,7 +75,7 @@ const ConditionHeatmap: React.FC = () => {
       const map: Record<string, number> = {};
       for (const s of sections) {
         const result = await triggerPCI(s.id).unwrap();
-        map[s.id] = result.finalPci;
+        map[s.id] = result?.finalPci;
       }
       setPciMap(map);
       const gj = createGeoJSON(sections, map);
@@ -93,12 +93,12 @@ const ConditionHeatmap: React.FC = () => {
 
   const onEachFeature = (feature: any, layer: L.Layer) => {
     const props = feature.properties;
-    layer.bindPopup(`<b>${props.name}</b><br/>PCI: ${props.pci}`);
+    layer.bindPopup(`<b>${props.name}</b><br/>PCI: ${props?.pci}`);
   };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      <h4 className="font-medium font-jakarta p-4">PCI Condition Heatmap</h4>
+      <h4 className="font-medium font-jakarta p-4 text-[16px]">PCI Condition Heatmap</h4>
       <MapContainer
         center={[37.78, -122.41]}
         zoom={11}

@@ -95,7 +95,7 @@ const CreateSampleUnitForm = ({
     // Append image only if a file is selected
     if (data.image_file && data.image_file.length > 0) {
       formData.append("image_file", data.image_file[0]);
-      formData.append("model_to_use", model)
+      formData.append("model_to_use", model);
     }
 
     // Now frontend validation: at least one of (image, distress_type) must be provided
@@ -152,7 +152,7 @@ const CreateSampleUnitForm = ({
       <SheetTrigger asChild>
         <button
           onClick={() => dispatch(resetSelectedSUAction())}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform active:scale-75 transition-transform cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 text-[16px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform active:scale-75 transition-transform cursor-pointer"
         >
           <Plus size={18} /> Add Sample Unit
         </button>
@@ -214,7 +214,9 @@ const CreateSampleUnitForm = ({
               <option value="Alligator Crack">Alligator Crack</option>
               <option value="Longitudinal Crack">Longitudinal Crack</option>
               <option value="Transverse Crack">Transverse Crack</option>
-              {/* <option value="Rutting">Rutting</option> */}
+              <option value="patching">Patching</option>
+              <option value="edge cracking">Edge Crack</option>
+              <option value="rutting">Rutting</option>
             </select>
           </div>
           <div>
@@ -265,7 +267,9 @@ const CreateSampleUnitForm = ({
             />
           </div>
           <div className="space-y-2">
-            <p className="block text-sm font-medium text-gray-700">Model to use</p>
+            <p className="block text-sm font-medium text-gray-700">
+              Model to use
+            </p>
             <div className="flex items-center gap-3">
               {VISION_MODELS.map((opt) => (
                 <label

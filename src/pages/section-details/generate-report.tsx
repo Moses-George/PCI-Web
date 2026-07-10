@@ -128,24 +128,30 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+import type { Section } from "@/types";
 
 const REPORT_OPTIONS = [
   "PCI Score",
   "Distress Summary",
   "Sample Unit Details",
   "Recommendations",
+  // "Detection Images",
+  // "Map Preview",
 ];
 
 const GenerateReport = ({
+  section,
   sectionId,
   reportModalOpen,
   setReportModalOpen,
 }: {
+  section: Section;
   sectionId: string | undefined;
   reportModalOpen: boolean;
   setReportModalOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const [reportName, setReportName] = useState("");
+  const section_name = section?.name?.split(" ")?.join("_");
+  const [reportName, setReportName] = useState(section_name);
   const [reportOptions, setReportOptions] = useState<string[]>([
     "PCI Score",
     "Distress Summary",
@@ -220,7 +226,7 @@ const GenerateReport = ({
 
   return (
     <Dialog open={reportModalOpen} onOpenChange={setReportModalOpen}>
-      <DialogContent className="font-jakarta">
+      <DialogContent className="font-jakarta z-[10000]">
         <DialogHeader>
           <DialogTitle>Generate Report</DialogTitle>
           <DialogDescription>

@@ -4,8 +4,8 @@ import {
   MapPin,
   Calendar,
   Network as NetworkIcon,
-  Delete,
   Edit,
+  Trash2,
 } from "lucide-react";
 import type { Network } from "@/types";
 import {
@@ -42,8 +42,9 @@ const Networks = () => {
     network: null,
   });
 
-  const { data: networks, isLoading, refetch } = useGetAllNetworksQuery({});
+  const { data: networks, isLoading, refetch } = useGetAllNetworksQuery();
   const [deleteNetwork, { isLoading: isDeleting }] = useDeleteNetworkMutation();
+  // console.log(networks);
 
   // const isDeleting = Boolean(
   //   selectedNetwork.network && selectedNetwork.action === "delete",
@@ -83,6 +84,12 @@ const Networks = () => {
       });
     }
   };
+
+  const networks_analyzed = networks?.filter((network) =>
+    network?.sections?.find((section) => section?.latest_pci),
+  )?.length;
+
+  // latest_pci
 
   if (isLoading)
     return (
@@ -137,8 +144,7 @@ const Networks = () => {
               Networks Analyzed
             </p>
             <p className="text-2xl font-jakarta font-bold">
-              {networks?.filter((n: Network) => n.total_sections > 0).length ||
-                0}
+              {networks_analyzed}
             </p>
           </div>
         </div>
@@ -173,7 +179,8 @@ const Networks = () => {
                     {net.coordinates[1].toFixed(2)}
                   </span>
                   <span className="flex items-center gap-1">
-                    <NetworkIcon size={14} /> {net.total_sections} sections
+                    <NetworkIcon size={14} /> {net.total_sections}{" "}
+                    {net.total_sections > 1 ? "sections" : "section"}
                   </span>
                 </div>
                 <div className="mt-3 font-jakarta flex justify-between items-center">
@@ -194,14 +201,14 @@ const Networks = () => {
                     onClick={() => handleAction(net, "delete")}
                     className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
                   >
-                    <Delete size={24} color="red" />
+                    <Trash2 size={20} color="red" />
                     <span className="text-sm">Delete</span>
                   </button>
                   <button
                     onClick={() => handleAction(net, "edit")}
                     className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
                   >
-                    <Edit size={22} color="blue" />
+                    <Edit size={20} color="blue" />
                     <span className="text-sm">Edit</span>
                   </button>
                 </div>

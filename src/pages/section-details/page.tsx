@@ -12,7 +12,7 @@ import {
   useGetSingleSectionSampleUnitsQuery,
 } from "@/store/api/sectionsApi";
 import SampleUnits from "./sample-units";
-import PCIScoreCard from "./PCI-Score-Card";
+import PCIScoreCard from "./pci/pci-score-card";
 
 const SectionDetail = () => {
   const { sectionId } = useParams<{
@@ -61,9 +61,9 @@ const SectionDetail = () => {
       {/* Header with actions */}
       <div className="flex flex-col gap-4 justify-between font-jakarta items-start">
         <div>
-          <h2 className="text-2xl font-bold">{section.name}</h2>
-          <p className="text-gray-500">{section.description}</p>
-          <div className="flex flex-wrap gap-4 mt-1 text-sm text-gray-500">
+          <h2 className="text-xl font-bold">{section.name}</h2>
+          <p className="text-gray-500 text-[16px]">{section.description}</p>
+          <div className="flex flex-wrap gap-4 mt-1 text-[14px] text-gray-500">
             <span className="flex items-center gap-1">
               <Ruler size={14} /> Width: {section.width}m
             </span>
@@ -94,7 +94,7 @@ const SectionDetail = () => {
           {sampleUnits?.length !== 0 && (
             <button
               onClick={() => setReportModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transform active:scale-75 transition-transform cursor-pointer"
+              className="flex items-center gap-2 px-4 py-3 text-[16px] bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transform active:scale-75 transition-transform cursor-pointer"
             >
               <FileText size={18} /> Generate Report
             </button>
@@ -109,26 +109,26 @@ const SectionDetail = () => {
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-        <h4 className="font-medium mb-2">Model Recommendation</h4>
+        <h4 className="font-medium mb-2 text-[16px]">Model Recommendation</h4>
         <div
           className={`p-3 rounded-lg border bg-red-100 text-red-800 border-red-300`}
         >
           <div className="flex">
             <div className="w-full">
-              <p className="font-semibold">Segmentation Model:</p>
-              <p className="text-[13px]">
+              <p className="font-semibold text-[14px]">Segmentation Model:</p>
+              <p className="text-[12px]">
                 Longitudinal Crack, Transverse Crack, Pothole.
               </p>
-              <p className="text-[13px]">
+              <p className="text-[12px]">
                 Others: Alligator Crack (Not really recommended)
               </p>
             </div>
             <div className="w-full">
-              <p className="font-semibold">Bounding Box Model:</p>
-              <p className="text-[13px]">
+              <p className="font-semibold text-[14px]">Bounding Box Model:</p>
+              <p className="text-[12px]">
                 Pothole, Alligator Crack, Patching, Rutting, Edge Crack.
               </p>
-              <p className="text-[13px]">
+              <p className="text-[12px]">
                 Others: Longitudinal Crack, Transverse Crack (Not really
                 recommended)
               </p>
@@ -139,9 +139,9 @@ const SectionDetail = () => {
 
       {/* Map and PCI result */}
       <div className="grid grid-cols-[6fr_4fr] gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <h4 className="font-medium p-4">Section Location</h4>
-          <div className="h-80">
+        <div className="rounded-xl shadow-sm border border-gray-200">
+          {/* <h4 className="font-medium p">Section Location</h4> */}
+          <div className="h-full">
             <MapPreview
               center={section.coordinates}
               zoom={14}
@@ -175,6 +175,7 @@ const SectionDetail = () => {
       )}
       {sampleUnits?.length !== 0 && (
         <GenerateReport
+          section={section}
           sectionId={sectionId}
           reportModalOpen={reportModalOpen}
           setReportModalOpen={setReportModalOpen}

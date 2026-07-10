@@ -67,7 +67,7 @@ const SampleUnits = ({
         />
       )}
       <div className="space-y-4">
-        <h3 className="font-semibold text-lg flex items-center gap-2">
+        <h3 className="font-semibold text- flex items-center gap-2">
           <Image size={20} /> Sample Units ({sampleUnits?.length || 0})
         </h3>
         {isLoading ? (

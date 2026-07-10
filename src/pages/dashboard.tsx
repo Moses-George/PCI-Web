@@ -86,15 +86,15 @@ const Dashboard = () => {
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-xl font-bold">
               Welcome back, Pavement Manager
             </h2>
-            <p className="text-blue-100 mt-1">
+            <p className="text-blue-100 mt-1 text-[15px]">
               Here's your real‑time pavement condition overview.
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-blue-200">
+            <p className="text-[14px] text-blue-200">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 year: "numeric",
@@ -102,7 +102,7 @@ const Dashboard = () => {
                 day: "numeric",
               })}
             </p>
-            <p className="text-sm text-blue-200">
+            <p className="text-[14px] text-blue-200">
               {new Date().toLocaleTimeString()}
             </p>
           </div>
@@ -111,7 +111,7 @@ const Dashboard = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.slice(0, 4).map((stat) => (
+        {stats?.slice(0, 4)?.map((stat) => (
           <div
             key={stat.label}
             className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center gap-4 transition-all hover:shadow-md"
@@ -120,14 +120,14 @@ const Dashboard = () => {
               {stat.icon}
             </div>
             <div>
-              <p className="text-gray-500 text-sm font-medium">{stat.label}</p>
-              <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
+              <p className="text-gray-500 text-[14px] font-medium">{stat.label}</p>
+              <p className="text-xl font-bold text-gray-800">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stats.slice(4).map((stat) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 -mt-4">
+        {stats?.slice(4)?.map((stat) => (
           <div
             key={stat.label}
             className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 flex items-center gap-4 transition-all hover:shadow-md"
@@ -136,8 +136,8 @@ const Dashboard = () => {
               {stat.icon}
             </div>
             <div>
-              <p className="text-gray-500 text-sm font-medium">{stat.label}</p>
-              <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
+              <p className="text-gray-500 text-[14px] font-medium">{stat.label}</p>
+              <p className="text-xl font-bold text-gray-800">{stat.value}</p>
             </div>
           </div>
         ))}
@@ -146,20 +146,20 @@ const Dashboard = () => {
       {/* Main Content: Charts & Map */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* PCI Distribution */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"> */}
           <ConditionDistribution />
-        </div>
+        {/* </div> */}
         {/* Condition Heatmap */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"> */}
           <ConditionHeatmap />
-        </div>
+        {/* </div> */}
       </div>
 
       {/* Additional Row: Distress Pie + Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Distress Type Distribution (Pie) */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:col-span-1">
-          <h4 className="font-semibold text-gray-700 mb-2">Distress Types</h4>
+          <h4 className="font-semibold text-gray-700 mb-2 text-[16px]">Distress Types</h4>
           <Chart
             options={{
               chart: { type: "pie", height: 250 },
@@ -168,7 +168,7 @@ const Dashboard = () => {
               legend: { position: "bottom" },
               dataLabels: {
                 enabled: true,
-                formatter: (val) => Number(val).toFixed(0) + "%",
+                formatter: (val) => Number(val)?.toFixed(0) + "%",
               },
             }}
             series={distresses_count}
@@ -180,16 +180,16 @@ const Dashboard = () => {
         {/* Recent Sample Units */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 lg:col-span-2">
           <div className="flex justify-between items-center mb-3">
-            <h4 className="font-semibold text-gray-700">Recent Sample Units</h4>
+            <h4 className="font-semibold text-gray-700 text-[16px]">Recent Sample Units</h4>
             <Link
               to="/sections"
-              className="text-sm text-blue-600 hover:underline"
+              className="text-[14px] text-blue-600 hover:underline"
             >
               View All
             </Link>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto h-68 [scrollbar-width:none] [-ms-overflow-style:none]">
+            <table className="w-full text-[14px]">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-2 text-left font-medium text-gray-500">
@@ -237,8 +237,8 @@ const Dashboard = () => {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <h4 className="font-semibold text-gray-700 mb-3">Quick Actions</h4>
-        <div className="flex flex-wrap gap-3">
+        <h4 className="font-semibold text-gray-700 mb-3 text-[15px]">Quick Actions</h4>
+        <div className="flex flex-wrap gap-3 text-[14px]">
           <Link
             to="/networks"
             className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 flex items-center gap-2"

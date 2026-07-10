@@ -34,7 +34,7 @@ const SUImages = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="relative">
-        <p className="text-sm font-medium text-gray-600 mb-1">Original Image</p>
+        <p className="text-[14px] font-medium text-gray-600 mb-1">Original Image</p>
         {original_image ? (
           <img
             src={original_image?.public_url}
@@ -50,7 +50,7 @@ const SUImages = ({
         )}
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-600 mb-1">
+        <p className="text-[14px] font-medium text-gray-600 mb-1">
           Predicted Image
         </p>
         {predicted_image ? (

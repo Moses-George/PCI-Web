@@ -113,9 +113,10 @@ const CreateSectionForm = ({
         payload,
       }).unwrap();
     } else {
+      console.log("networkId", networkId);
       await createSection({
-        networkId: networkId!,
-        data: payload,
+        network_id: networkId!,
+        payload,
       }).unwrap();
     }
     reset();

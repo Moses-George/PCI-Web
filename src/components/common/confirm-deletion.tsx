@@ -23,10 +23,10 @@ const ConfirmDeletion = ({
     <div className="flex justify-center items-center fixed h-full inset-0 bg-[#7180967A] backdrop-blur-[1.5px] z-[9999]">
       <div className="bg-white px-4 py-6 rounded shadow-md md:w-[500px] z-[9999] space-y-10">
         <div className="space-y-2">
-          <h1 className="lg:text-xxl text-lg text-gray-800 font-semibold">
+          <h1 className="text-[17px] text-gray-800 font-semibold">
             {header}
           </h1>
-          <p className="text-sm text-slate-500">{message}</p>
+          <p className="text-[14px] text-slate-500">{message}</p>
         </div>
         <div className="flex gap-4">
           <button
