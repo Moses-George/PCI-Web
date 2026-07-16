@@ -46,7 +46,7 @@ export function useInferenceStatus(
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     const ws = new WebSocket(
-      `ws://${VITE_ENDPOINT_URL}/ws/inference/${sampleUnitId}`
+      `wss://${VITE_ENDPOINT_URL}/ws/inference/${sampleUnitId}`
     );
     wsRef.current = ws;
 
