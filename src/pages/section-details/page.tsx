@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useParams } from "react-router-dom";
 import Spinner from "@/components/common/spinner";
-import MapPreview from "@/components/common/map-preview";
+import MapPreview, {
+  type SectionOverlay,
+} from "@/components/common/map-preview";
 import { useRef, useState } from "react";
 import { FileText, MapPin, Ruler, Calendar } from "lucide-react";
 import MaintenanceRecommendations from "@/components/maintenance/MaintenanceRecommendations";
@@ -24,7 +26,7 @@ const SectionDetail = () => {
   const {
     data: sampleUnits,
     isLoading: isLoadingSU,
-    refetch,
+    refetch: refetchSampleUnit,
   } = useGetSingleSectionSampleUnitsQuery(sectionId!);
 
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -47,7 +49,30 @@ const SectionDetail = () => {
   console.log("sec", section);
 
   const pci = section?.latest_pci;
-  // const pci_rating = section?.latest_rating;
+  let section_overlay: SectionOverlay[] = [];
+
+  if (section) {
+    const start_coord: [number, number] = [
+      section.start_coordinates[0],
+      section.start_coordinates[1],
+    ];
+    const end_coord: [number, number] = [
+      section.end_coordinates[0],
+      section.end_coordinates[1],
+    ];
+
+    section_overlay = [
+      {
+        id: section!.id,
+        name: section!.name,
+        start: start_coord,
+        end: end_coord,
+        length: section!.length,
+        pci: section!.latest_pci ?? 0,
+        condition: section!.latest_rating,
+      },
+    ];
+  }
 
   if (!section)
     return (
@@ -57,7 +82,7 @@ const SectionDetail = () => {
     );
 
   return (
-    <div className="space-y-6 font-jakarta">
+    <div className="space-y-6 font-jakarta max-w-5xl mx-auto">
       {/* Header with actions */}
       <div className="flex flex-col gap-4 justify-between font-jakarta items-start">
         <div>
@@ -71,8 +96,14 @@ const SectionDetail = () => {
               <Ruler size={14} /> Length: {section.length}m
             </span>
             <span className="flex items-center gap-1">
-              <MapPin size={14} /> Chainage: {section.chainage_start}-
-              {section.chainage_end}m
+              Start
+              <MapPin size={14} /> {section.start_coordinates[0].toFixed(2)},{" "}
+              {section.start_coordinates[1].toFixed(2)}
+            </span>
+            <span className="flex items-center gap-1">
+              End
+              <MapPin size={14} /> {section.end_coordinates[0].toFixed(2)},{" "}
+              {section.end_coordinates[1].toFixed(2)}
             </span>
             <span className="flex items-center gap-1">
               <Calendar size={14} /> Created:{" "}
@@ -81,16 +112,6 @@ const SectionDetail = () => {
           </div>
         </div>
         <div className="flex gap-3">
-          {/* {sampleUnits?.length !== 0 && (
-            <button
-              onClick={handleCalculatePCI}
-              disabled={pciLoading || section.is_calculated}
-              className={`flex items-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transform active:scale-75 transition-transform cursor-pointer ${section.is_calculated || pciLoading ? "hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed" : ""}`}
-            >
-              <Calculator size={18} />{" "}
-              {pciLoading ? "Calculating..." : "Calculate PCI"}
-            </button>
-          )} */}
           {sampleUnits?.length !== 0 && (
             <button
               onClick={() => setReportModalOpen(true)}
@@ -102,8 +123,10 @@ const SectionDetail = () => {
           <CreateSampleUnitForm
             section={section}
             sectionId={sectionId}
-            refetch={refetch}
+            refetch={refetchSampleUnit}
+            refetchSection={refetchSection}
             onSuccess={scrollToFirst}
+            num_sample_units={sampleUnits?.length ?? 0}
           />
         </div>
       </div>
@@ -143,10 +166,11 @@ const SectionDetail = () => {
           {/* <h4 className="font-medium p">Section Location</h4> */}
           <div className="h-full">
             <MapPreview
-              center={section.coordinates}
-              zoom={14}
+              center={section.start_coordinates}
+              zoom={19}
               height="100%"
               className="rounded-b-md h-full"
+              sections={section_overlay}
             />
           </div>
         </div>
@@ -161,7 +185,7 @@ const SectionDetail = () => {
       <SampleUnits
         isLoading={isLoadingSU}
         sampleUnits={sampleUnits}
-        refetch={refetch}
+        refetch={refetchSampleUnit}
         scrollToFirstRef={firstSampleUnitRef}
         refetchSection={refetchSection}
       />

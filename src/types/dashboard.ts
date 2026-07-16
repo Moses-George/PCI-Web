@@ -6,6 +6,7 @@ export interface DashboardStats {
   avg_pci: number;
   critical_sections: number;
   analyzed_sections: number;
+  latest_section_id: string | null
 }
 
 export interface PCIDistributionItem {
@@ -21,7 +22,8 @@ export interface DistressDistributionItem {
 export interface RecentSampleUnit {
   id: string;
   name: string;
-  section: string;
+  section_name: string;
+  section_area: string;
   date: Date;
   status: string; // Processed, Pending, Processing
 }

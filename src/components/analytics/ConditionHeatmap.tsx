@@ -33,8 +33,8 @@ const createGeoJSON = (sections: any[], pciMap: Record<string, number>) => {
       else if (pci < 70) color = "#f59e0b";
       else if (pci < 85) color = "#3b82f6";
       // Create a small polygon around coordinates (approximate)
-      const lat = s.coordinates[0];
-      const lng = s.coordinates[1];
+      const lat = s.start_coordinates[0];
+      const lng = s.start_coordinates[1];
       const radius = 0.001; // ~100m
       const points = [
         [lat - radius, lng - radius],
@@ -68,13 +68,14 @@ const ConditionHeatmap: React.FC = () => {
   const [triggerPCI] = useLazyCalculatePCIQuery();
   const [pciMap, setPciMap] = useState<Record<string, number>>({});
   const [geoJson, setGeoJson] = useState<any>(null);
+  console.log(pciMap);
 
   useEffect(() => {
     if (!sections) return;
     const fetchPci = async () => {
       const map: Record<string, number> = {};
       for (const s of sections) {
-        const result = await triggerPCI(s.id).unwrap();
+        const result = await triggerPCI(s.id).unwrap() as any;
         map[s.id] = result?.finalPci;
       }
       setPciMap(map);
@@ -97,8 +98,10 @@ const ConditionHeatmap: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      <h4 className="font-medium font-jakarta p-4 text-[16px]">PCI Condition Heatmap</h4>
+    <div className="bg-white h-full rounded-xl shadow-sm border border-gray-200">
+      <h4 className="font-medium font-jakarta p-4 text-[16px]">
+        PCI Condition Heatmap
+      </h4>
       <MapContainer
         center={[37.78, -122.41]}
         zoom={11}

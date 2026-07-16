@@ -1,9 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable no-useless-assignment */
-import React, { useState } from 'react';
-import { useGetSectionsQuery, useLazyCalculatePCIQuery } from '../store/api/apiSlice';
+import React, { useState } from "react";
+import {
+  useGetSectionsQuery,
+  useLazyCalculatePCIQuery,
+} from "../store/api/apiSlice";
 // import { useGetSampleUnitsBySectionQuery } from '../store/api/apiSlice';
-import Spinner from '../components/common/spinner';
+import Spinner from "../components/common/spinner";
 // import { unitCosts } from '../constants/dummyExtended';
 // import { saveAs } from 'file-saver'; // you may need to install file-saver
 // import * as XLSX from 'xlsx'; // you may need to install xlsx
@@ -22,8 +26,8 @@ const BudgetPlanner: React.FC = () => {
       setLoadingPci(true);
       const map: Record<string, number> = {};
       for (const s of sections) {
-        const result = await triggerPCI(s.id).unwrap();
-        map[s.id] = result.finalPci;
+        const result = await triggerPCI(s.id).unwrap() as any;
+        map[s.id] = result?.finalPci;
       }
       setPciMap(map);
       setLoadingPci(false);
@@ -31,10 +35,15 @@ const BudgetPlanner: React.FC = () => {
     loadPci();
   }, [sections, triggerPCI]);
 
-  if (sectionsLoading || loadingPci) return <div className="flex justify-center py-20"><Spinner /></div>;
+  if (sectionsLoading || loadingPci)
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner />
+      </div>
+    );
 
   const toggleSelect = (id: string) => {
-    setSelected(prev => ({ ...prev, [id]: !prev[id] }));
+    setSelected((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const selectAll = () => {
@@ -60,17 +69,22 @@ const BudgetPlanner: React.FC = () => {
     return cost;
   };
 
-  const totalCost = sections?.reduce((sum, s) => selected[s.id] ? sum + computeCost(s.id) : sum, 0) || 0;
+  const totalCost =
+    sections?.reduce(
+      (sum, s) => (selected[s.id] ? sum + computeCost(s.id) : sum),
+      0,
+    ) || 0;
 
   const exportCSV = () => {
     if (!sections) return;
     const data = sections
-      .filter(s => selected[s.id])
-      .map(s => ({
+      .filter((s) => selected[s.id])
+      .map((s) => ({
         Name: s.name,
-        PCI: pciMap[s.id] || 'N/A',
-        'Estimated Cost ($)': computeCost(s.id),
+        PCI: pciMap[s.id] || "N/A",
+        "Estimated Cost ($)": computeCost(s.id),
       }));
+        console.log(data)
     // const ws = XLSX.utils.json_to_sheet(data);
     // const wb = XLSX.utils.book_new();
     // XLSX.utils.book_append_sheet(wb, ws, 'Budget');
@@ -80,13 +94,26 @@ const BudgetPlanner: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-jakarta">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Budget Planner</h2>
-        <div className="flex gap-3">
-          <button onClick={selectAll} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Select All</button>
-          <button onClick={deselectAll} className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Deselect All</button>
-          <button onClick={exportCSV} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2">
+        <div className="flex gap-3 text-[14px]">
+          <button
+            onClick={selectAll}
+            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            Select All
+          </button>
+          <button
+            onClick={deselectAll}
+            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+          >
+            Deselect All
+          </button>
+          <button
+            onClick={exportCSV}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
+          >
             <span>💾</span> Export Selected
           </button>
         </div>
@@ -94,11 +121,15 @@ const BudgetPlanner: React.FC = () => {
 
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
         <div className="flex justify-between items-center mb-4">
-          <p className="text-sm text-gray-500">Select sections to include in budget plan.</p>
-          <p className="text-lg font-bold">Total Estimated Cost: ${totalCost.toLocaleString()}</p>
+          <p className="text-[14px] text-gray-500">
+            Select sections to include in budget plan.
+          </p>
+          <p className="text-[16px] font-bold">
+            Total Estimated Cost: ${totalCost.toLocaleString()}
+          </p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse text-[15px]">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-2 text-left">Select</th>
@@ -108,7 +139,7 @@ const BudgetPlanner: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {sections?.map(s => (
+              {sections?.map((s) => (
                 <tr key={s.id} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-2">
                     <input
@@ -118,8 +149,10 @@ const BudgetPlanner: React.FC = () => {
                     />
                   </td>
                   <td className="px-4 py-2">{s.name}</td>
-                  <td className="px-4 py-2">{pciMap[s.id] || 'N/A'}</td>
-                  <td className="px-4 py-2">${computeCost(s.id).toLocaleString()}</td>
+                  <td className="px-4 py-2">{pciMap[s.id] || "N/A"}</td>
+                  <td className="px-4 py-2">
+                    ${computeCost(s.id).toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>

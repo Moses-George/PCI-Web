@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   setOpenDeleModal,
   setOpenForm,
@@ -7,11 +6,11 @@ import {
 } from "@/store/slices/sampleUnitSlice";
 import type { ActionType, SampleUnit } from "@/types";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ChevronUp, ChevronDown, Trash2, Edit } from "lucide-react";
 import { useInferenceStatus } from "@/hooks/useInferenceStatus";
 import { InferenceProgress } from "@/components/common/Inference-progress";
-import type { RootState } from "@/store/store";
+// import type { RootState } from "@/store/store";
 import SUImages from "./su-image";
 import DetectionActionBtns from "./detection-action-btns";
 
@@ -25,12 +24,12 @@ const SampleUnitCard = ({
   refetchSection: any
 }) => {
   const dispatch = useDispatch();
-  const {
-    action,
-    sample_unit: selectedSampleUnit,
-    // isScrollDown
-  } = useSelector((state: RootState) => state.sampleUnit);
-  const isEditing = Boolean(selectedSampleUnit && action === "edit");
+  // const {
+  //   action,
+  //   sample_unit: selectedSampleUnit,
+  //   // isScrollDown
+  // } = useSelector((state: RootState) => state.sampleUnit);
+  // const isEditing = Boolean(selectedSampleUnit && action === "edit");
 
   const [selectedSUExplorer, setSelectedSUExplorer] =
     useState<SampleUnit | null>(null);

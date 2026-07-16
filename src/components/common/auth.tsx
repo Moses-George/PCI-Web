@@ -56,7 +56,7 @@ const Auth = () => {
       <div className="bg-white px-8 py-6 rounded shadow-md md:w-[500px] z-[9999] space-y-6">
         <div className="space-y-">
           <h1 className="lg:text-xl text-lg text-gray-800 font-semibold">
-            System User Authorization is Required
+            User Authorization is Required
           </h1>
           <p className="text-sm text-slate-500">
             Please enter user Email and Password to continue

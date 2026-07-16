@@ -54,7 +54,8 @@ export interface Network {
   id: string;
   name: string;
   description: string;
-  coordinates: [number, number]; // [lat, lng]
+  start_coordinates: [number, number]; // [lat, lng]
+  end_coordinates: [number, number]; // [lat, lng]
   total_sections: number;
   created_at: string;
 }
@@ -68,9 +69,8 @@ export interface Section {
   networkId: string;
   name: string;
   description: string;
-  coordinates: [number, number];
-  chainage_start: number;
-  chainage_end: number;
+  start_coordinates: [number, number]; // [lat, lng]
+  end_coordinates: [number, number]; // [lat, lng]
   width: number;
   length: number;
   pixel_to_mm_factor: number;

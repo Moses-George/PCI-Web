@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { Network, Section, SampleUnit, PCIResult } from "../../types";
+import type { Network, Section, SampleUnit} from "../../types";
 
 
 const isDummy = true; // toggle to false when real backend is ready
@@ -182,13 +182,13 @@ export const apiSlice = createApi({
     }),
 
     // PCI calculation (lazy query)
-    calculatePCI: builder.query<PCIResult, string>({
+    calculatePCI: builder.query({
       queryFn: async (sectionId, _api, _extraOptions, baseQuery) => {
         if (isDummy) {
           await new Promise((resolve) => setTimeout(resolve, 500));
           const pci = Math.floor(Math.random() * 50 + 40);
           // eslint-disable-next-line no-useless-assignment
-          let rating: PCIResult["rating"] = "Good";
+          let rating = "Good";
           if (pci < 40) rating = "Failed";
           else if (pci < 55) rating = "Very Poor";
           else if (pci < 70) rating = "Poor";
@@ -209,7 +209,7 @@ export const apiSlice = createApi({
           url: `/sections/${sectionId}/calculate-pci`,
         });
         if (result.error) return { error: result.error };
-        return { data: result.data as PCIResult };
+        return { data: result.data  };
       },
       providesTags: ["PCI"],
     }),

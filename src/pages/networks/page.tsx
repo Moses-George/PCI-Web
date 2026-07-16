@@ -21,8 +21,10 @@ import { toast } from "react-toastify";
 export interface INetworkForm {
   name: string;
   description: string;
-  lat: number;
-  lng: number;
+  start_lat: number;
+  start_lng: number;
+  end_lat: number;
+  end_lng: number;
 }
 
 type ActionType = "delete" | "edit" | null;
@@ -60,8 +62,10 @@ const Networks = () => {
       network: {
         name: network.name,
         description: network.description,
-        lat: network.coordinates[0],
-        lng: network.coordinates[1],
+        start_lat: network.start_coordinates[0],
+        start_lng: network.start_coordinates[1],
+        end_lat: network.end_coordinates[0],
+        end_lng: network.end_coordinates[1],
       },
     });
     if (action === "edit") {
@@ -109,7 +113,7 @@ const Networks = () => {
           message={`Are you sure you want to delete ${selectedNetwork.network?.name} Network ? Please note that all sections in this network and sample units in each sections will also be deleted permanently. This action cannot be undone`}
         />
       )}
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-[63rem] mx-auto">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold font-jakarta">Road Networks</h2>
           <NetworkForm
@@ -150,72 +154,113 @@ const Networks = () => {
         </div>
 
         {/* Network Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {networks?.map((net: Network) => (
-            <div
-              key={net.id}
-              className="bg-white w-full rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <div className="h-56">
-                <MapPreview
-                  center={net.coordinates}
-                  zoom={12}
-                  markers={[
-                    { lat: net.coordinates[0], lng: net.coordinates[1] },
-                  ]}
-                  height="100%"
-                />
-              </div>
-              <div className="p-4 space-y-4">
-                <h3 className="font-semibold font-jakarta text-lg">
-                  {net.name}
-                </h3>
-                <p className="text-sm font-jakarta text-gray-500 line-clamp-2">
-                  {net.description}
-                </p>
-                <div className="mt-2 font-jakarta flex items-center gap-3 text-xs text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <MapPin size={14} /> {net.coordinates[0].toFixed(2)},{" "}
-                    {net.coordinates[1].toFixed(2)}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <NetworkIcon size={14} /> {net.total_sections}{" "}
-                    {net.total_sections > 1 ? "sections" : "section"}
-                  </span>
+        {!networks || networks?.length == 0 ? (
+          <div className="font-jakarta font-medium text-center text-gray-400 py-20">
+            No Network Added
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            {networks?.map((net) => {
+              const network_sections_overlay = net?.sections?.map((section) => {
+                const start_coord: [number, number] = [
+                  section.start_coordinates[0],
+                  section.start_coordinates[1],
+                ];
+                const end_coord: [number, number] = [
+                  section.end_coordinates[0],
+                  section.end_coordinates[1],
+                ];
+                return {
+                  id: section!.id,
+                  name: section!.name,
+                  start: start_coord,
+                  end: end_coord,
+                  length: section!.length,
+                  pci: section!.latest_pci ?? 0,
+                  condition: section!.latest_rating,
+                };
+              });
+              return (
+                <div
+                  key={net.id}
+                  className="bg-white w-full rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="h-64">
+                    <MapPreview
+                      center={net.start_coordinates}
+                      zoom={19}
+                      markers={[
+                        {
+                          lat: net.start_coordinates[0],
+                          lng: net.start_coordinates[1],
+                        },
+                        {
+                          lat: net.end_coordinates[0],
+                          lng: net.end_coordinates[1],
+                        },
+                      ]}
+                      height="100%"
+                      sections={network_sections_overlay}
+                    />
+                  </div>
+                  <div className="p-4 space-y-4">
+                    <h3 className="font-semibold font-jakarta text-lg">
+                      {net.name}
+                    </h3>
+                    <p className="text-sm font-jakarta text-gray-500 line-clamp-2">
+                      {net.description}
+                    </p>
+                    <div className="mt-2 font-jakarta flex items-center gap-3 text-xs text-gray-400">
+                      <span className="flex items-center gap-1">
+                        <MapPin size={14} />{" "}
+                        {net.start_coordinates[0].toFixed(2)},{" "}
+                        {net.start_coordinates[1].toFixed(2)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPin size={14} />{" "}
+                        {net.end_coordinates[0].toFixed(2)},{" "}
+                        {net.end_coordinates[1].toFixed(2)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <NetworkIcon size={14} /> {net.total_sections}{" "}
+                        {net.total_sections > 1 ? "sections" : "section"}
+                      </span>
+                    </div>
+                    <div className="mt-3 font-jakarta flex justify-between items-center">
+                      <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <Calendar size={12} />{" "}
+                        {new Date(net.created_at).toLocaleDateString()}
+                      </span>
+                      <a
+                        href={`/networks/${net.id}`}
+                        className="text-blue-600 hover:underline text-sm font-medium"
+                      >
+                        View Details →
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-3 font-jakarta">
+                      <div className="font-bold text-sm">Actions:</div>
+                      <button
+                        onClick={() => handleAction(net, "delete")}
+                        className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
+                      >
+                        <Trash2 size={20} color="red" />
+                        <span className="text-sm">Delete</span>
+                      </button>
+                      <button
+                        onClick={() => handleAction(net, "edit")}
+                        className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
+                      >
+                        <Edit size={20} color="blue" />
+                        <span className="text-sm">Edit</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-3 font-jakarta flex justify-between items-center">
-                  <span className="text-xs text-gray-400 flex items-center gap-1">
-                    <Calendar size={12} />{" "}
-                    {new Date(net.created_at).toLocaleDateString()}
-                  </span>
-                  <a
-                    href={`/networks/${net.id}`}
-                    className="text-blue-600 hover:underline text-sm font-medium"
-                  >
-                    View Details →
-                  </a>
-                </div>
-                <div className="flex items-center gap-3 font-jakarta">
-                  <div className="font-bold text-sm">Actions:</div>
-                  <button
-                    onClick={() => handleAction(net, "delete")}
-                    className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
-                  >
-                    <Trash2 size={20} color="red" />
-                    <span className="text-sm">Delete</span>
-                  </button>
-                  <button
-                    onClick={() => handleAction(net, "edit")}
-                    className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
-                  >
-                    <Edit size={20} color="blue" />
-                    <span className="text-sm">Edit</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </>
   );

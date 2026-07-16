@@ -193,7 +193,7 @@ export default function PCIHistoryModal({
                           className="hover:bg-slate-50/50 transition-colors"
                         >
                           <td className="px-4 py-3 capitalize font-medium text-slate-700">
-                            {obs.distress_type}
+                            {obs.distress_type.split("_").join(" ")}
                           </td>
                           <td className="px-4 py-3 capitalize text-slate-600">
                             {obs.severity}

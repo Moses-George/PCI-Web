@@ -62,8 +62,7 @@
 import React, { useState } from "react";
 import PCITrendChart from "@/components/analytics/PCITrendChart.tsx";
 import DistressDistribution from "@/components/analytics/DistressDistribution";
-import ConditionDistribution from "@/components/analytics/ConditionDistribution";
-import ConditionHeatmap from "@/components/analytics/ConditionHeatmap";
+import ConditionHeatmap from "@/components/analytics/ConditionHeatmap"; 
 import Spinner from "@/components/common/spinner";
 import { useGetNetworkSummaryQuery } from "@/store/api/analyticsApi";
 import { useGetAllSectionsQuery } from "@/store/api/sectionsApi";
@@ -85,7 +84,7 @@ const Analytics: React.FC = () => {
   const sectionId = selectedSection ?? sections?.[0]?.id ?? null;
 
   return (
-    <div className="space-y-6 font-jakarta">
+    <div className="space-y-6 font-jakarta max-w-[63rem] mx-auto">
       <h2 className="text-xl font-jakarta font-bold">Analytics Dashboard</h2>
 
       {/* Summary cards */}
@@ -139,7 +138,7 @@ const Analytics: React.FC = () => {
             <ConditionHeatmap />
           </div>
           <DistressDistribution sectionId={sectionId} />
-          <ConditionDistribution />
+          {/* <ConditionDistribution /> */}
         </>
       ) : (
         <div className="bg-white w-full h-[30rem] font-jakarta border rounded-lg shadow-md mx-auto">

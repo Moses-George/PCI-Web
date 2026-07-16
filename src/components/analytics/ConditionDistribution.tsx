@@ -75,7 +75,7 @@ const ConditionDistribution: React.FC = () => {
 
   if (!data || data?.length === 0) {
     return (
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-center h-64">
+      <div className="bg-white h-full p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-center">
         <p className="text-gray-400 font-jakarta text-sm">
           No PCI data yet. Calculate PCI for your sections first.
         </p>

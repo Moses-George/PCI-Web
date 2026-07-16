@@ -14,20 +14,21 @@ import {
 } from "../../components/ui/sheet";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { type Dispatch, type SetStateAction } from "react";
+import { useEffect, type Dispatch, type SetStateAction } from "react";
 // import type { Network } from "@/types";
 import type { ISelectedSection } from "./page";
-import type { Network } from "@/types";
+import type { NetworkWithSections } from "@/types";
 import { createPortal } from "react-dom";
 import Backdrop from "@/components/common/backdrop";
+import { destinationPoint } from "@/utils/geo_helper";
 
 interface SectionForm {
   name: string;
   description: string;
-  lat: number;
-  lng: number;
-  chainageStart: number;
-  chainageEnd: number;
+  start_lat: number;
+  start_lng: number;
+  end_lat: number;
+  end_lng: number;
   width: number;
   length: number;
   pixelToMmFactor: number;
@@ -43,7 +44,7 @@ const CreateSectionForm = ({
   selectedSection,
   setSelectedSection,
 }: {
-  network: Network;
+  network: NetworkWithSections;
   networkId: string | undefined;
   refetchNetwork: any;
   isEditing: boolean;
@@ -54,12 +55,19 @@ const CreateSectionForm = ({
 }) => {
   const [createSection, { isLoading: isCreating }] = useCreateSectionMutation();
   const [updateSection, { isLoading: isUpdating }] = useUpdateSectionMutation();
-  // const [open, setOpen] = useState(false);
+  const num_sections = network?.sections?.length;
+  const has_sections = num_sections > 0;
+  const last_section = network?.sections[num_sections - 1];
+  const last_section_end_coords = last_section?.end_coordinates;
+
+  // const new_end_coords = destinationPoint(last_section_end_coords[0], last_section_end_coords[1], 0,  9)
 
   const {
     register,
     handleSubmit,
     reset,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<SectionForm>({
     values: isEditing
@@ -67,42 +75,37 @@ const CreateSectionForm = ({
       : {
           name: "",
           description: "",
-          lat: network?.coordinates[0] || 37.7749,
-          lng: network?.coordinates[1] || -122.4194,
-          chainageStart: 0,
-          chainageEnd: 1,
-          width: 10,
-          length: 1,
+          start_lat: has_sections
+            ? last_section_end_coords[0]
+            : network?.start_coordinates[0],
+          start_lng: has_sections
+            ? last_section_end_coords[1]
+            : network?.start_coordinates[1],
+          end_lat: network?.end_coordinates[0],
+          end_lng: network?.end_coordinates[1],
+          width: 9,
+          length: 18,
           pixelToMmFactor: 0.5,
         },
   });
 
+  useEffect(() => {
+    if (has_sections) {
+      const { length, start_lat, start_lng } = getValues();
+      const new_end_coords = destinationPoint(start_lat, start_lng, 90, length);
+      setValue("end_lat", +new_end_coords[0].toFixed(6));
+      setValue("end_lng", +new_end_coords[1].toFixed(6));
+    }
+  }, [getValues, has_sections, setValue]);
+
   const onSubmit = async (data: SectionForm) => {
-    // const p = Object.fromEntries(formData);
     console.log("formData", data);
-    // await createSection({
-    //   networkId: networkId!,
-    //   data: {
-    //     name: data.name,
-    //     description: data.description,
-    //     coordinates: [data.lat, data.lng],
-    //     chainage_start: +data.chainageStart.toFixed(2),
-    //     chainage_end: +data.chainageEnd.toFixed(2),
-    //     width: +data.width.toFixed(2),
-    //     length: +data.length.toFixed(2),
-    //     pixel_to_mm_factor: +data.pixelToMmFactor.toFixed(2),
-    //   },
-    // }).unwrap();
-    // reset();
-    // setOpenForm(false);
-    // refetchNetwork();
 
     const payload = {
       name: data.name,
       description: data.description,
-      coordinates: [data.lat, data.lng],
-      chainage_start: +data.chainageStart.toFixed(2),
-      chainage_end: +data.chainageEnd.toFixed(2),
+      start_coordinates: [data.start_lat, data.start_lng],
+      end_coordinates: [data.end_lat, data.end_lng],
       width: +data.width.toFixed(2),
       length: +data.length.toFixed(2),
       pixel_to_mm_factor: +data.pixelToMmFactor.toFixed(2),
@@ -144,6 +147,7 @@ const CreateSectionForm = ({
         </SheetTrigger>
         <SheetContent
           side="right"
+          onCloseAutoFocus={(e) => e.preventDefault()}
           className="w-full max-w-md overflow-y-auto z-[99999] font-jakarta"
         >
           <SheetHeader>
@@ -182,66 +186,6 @@ const CreateSectionForm = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Latitude
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  {...register("lat", {
-                    required: true,
-                    valueAsNumber: true,
-                  })}
-                  className="mt-1 w-full px-3 py-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Longitude
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  {...register("lng", {
-                    required: true,
-                    valueAsNumber: true,
-                  })}
-                  className="mt-1 w-full px-3 py-2 border rounded-md"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Chainage Start (m)
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  {...register("chainageStart", {
-                    required: true,
-                    valueAsNumber: true,
-                  })}
-                  className="mt-1 w-full px-3 py-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Chainage End (m)
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  {...register("chainageEnd", {
-                    required: true,
-                    valueAsNumber: true,
-                  })}
-                  className="mt-1 w-full px-3 py-2 border rounded-md"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
                   Width (m)
                 </label>
                 <input
@@ -267,6 +211,76 @@ const CreateSectionForm = ({
                   })}
                   className="mt-1 w-full px-3 py-2 border rounded-md"
                 />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="block text-sm font-medium text-gray-700">
+                Start Coordinates
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Latitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("start_lat", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Longitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("start_lng", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className="block text-sm font-medium text-gray-700">
+                End Coordinates
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Latitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("end_lat", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Longitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("end_lng", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
               </div>
             </div>
             <div>

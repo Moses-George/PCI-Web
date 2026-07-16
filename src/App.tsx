@@ -11,14 +11,20 @@ import BudgetPlanner from "./pages/budgetplanner";
 import Auth from "./components/common/auth";
 import { useSelector } from "react-redux";
 import type { RootState } from "./store/store";
+import useIsMobile from "./hooks/useMobile";
+import MobileBlock from "./components/common/mobile-block";
+
 
 function App() {
+  const isMobile = useIsMobile();
+
   const elements = useRoutes([
     { path: "/", element: <Dashboard /> },
     { path: "/dashboard", element: <Dashboard /> },
     { path: "/networks", element: <Networks /> },
     { path: "/networks/:networkId", element: <NetworkDetail /> },
     { path: "/sections", element: <Sections /> },
+    { path: "/sections/:sectionId", element: <SectionDetail /> },
     {
       path: "/networks/:networkId/sections/:sectionId",
       element: <SectionDetail />,
@@ -29,23 +35,12 @@ function App() {
 
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
+  // Block mobile before anything else — including auth
+  if (isMobile) return <MobileBlock />;
+
   if (!isAuthenticated) return <Auth />;
 
   return <MainLayout>{elements}</MainLayout>;
-
-  // return (
-  //   <Routes>
-  //     <Route path="/" element={<MainLayout />}>
-  //       <Route index element={<Dashboard />} />
-  //       <Route path="networks" element={<Networks />} />
-  //       <Route path="networks/:networkId/sections" element={<Sections />} />
-  //       <Route
-  //         path="sections/:sectionId/sample-units"
-  //         element={<SampleUnitDetail />}
-  //       />
-  //     </Route>
-  //   </Routes>
-  // );
 }
 
 export default App;

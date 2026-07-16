@@ -4,8 +4,11 @@ import type { ApexOptions } from "apexcharts";
 import { useGetDistressDistributionQuery } from "@/store/api/analyticsApi";
 import Spinner from "@/components/common/spinner";
 
-const DistressDistribution: React.FC<{ sectionId: string }> = ({ sectionId }) => {
+const DistressDistribution: React.FC<{ sectionId: string }> = ({
+  sectionId,
+}) => {
   const { data, isLoading } = useGetDistressDistributionQuery(sectionId);
+  console.log("dis", data);
 
   if (isLoading) {
     return (
@@ -18,13 +21,17 @@ const DistressDistribution: React.FC<{ sectionId: string }> = ({ sectionId }) =>
   if (!data || data?.type_distribution?.length === 0) {
     return (
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-center h-64">
-        <p className="text-gray-400 font-jakarta text-sm">No distress data available.</p>
+        <p className="text-gray-400 font-jakarta text-sm">
+          No distress data available.
+        </p>
       </div>
     );
   }
 
-  const labels = data.type_distribution.map((d) => d.distress_type);
-  const counts = data.type_distribution.map((d) => d.count);
+  const labels = data?.type_distribution.map((d) =>
+    d.distress_type.split("_").join(" "),
+  );
+  const counts = data?.type_distribution.map((d) => d.count);
 
   const pieOptions: ApexOptions = {
     chart: { type: "pie" },
@@ -34,7 +41,8 @@ const DistressDistribution: React.FC<{ sectionId: string }> = ({ sectionId }) =>
     title: { text: "Distress Type Distribution" },
   };
 
-  const sevTypes = data.severity_distribution.map((d) => d.distress_type);
+  const sevTypes = data.severity_distribution.map((d) => d.distress_type.split("_").join(" "));
+  console.log("sevTypes", sevTypes);
   const barOptions: ApexOptions = {
     chart: { type: "bar", stacked: true },
     xaxis: { categories: sevTypes, title: { text: "Distress Type" } },
@@ -46,9 +54,9 @@ const DistressDistribution: React.FC<{ sectionId: string }> = ({ sectionId }) =>
   };
 
   const barSeries = [
-    { name: "Low",    data: data.severity_distribution.map((d) => d.low) },
+    { name: "Low", data: data.severity_distribution.map((d) => d.low) },
     { name: "Medium", data: data.severity_distribution.map((d) => d.medium) },
-    { name: "High",   data: data.severity_distribution.map((d) => d.high) },
+    { name: "High", data: data.severity_distribution.map((d) => d.high) },
   ];
 
   return (
@@ -57,7 +65,12 @@ const DistressDistribution: React.FC<{ sectionId: string }> = ({ sectionId }) =>
         <Chart options={pieOptions} series={counts} type="pie" height={300} />
       </div>
       <div>
-        <Chart options={barOptions} series={barSeries} type="bar" height={300} />
+        <Chart
+          options={barOptions}
+          series={barSeries}
+          type="bar"
+          height={300}
+        />
       </div>
     </div>
   );

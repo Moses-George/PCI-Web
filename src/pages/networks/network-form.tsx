@@ -49,14 +49,22 @@ const NetworkForm = ({
       ? {
           ...selectedNetwork.network!,
         }
-      : { name: "", description: "", lat: 37.7749, lng: -122.4194 },
+      : {
+          name: "",
+          description: "",
+          start_lat: 37.7749,
+          start_lng: -122.4194,
+          end_lat: 38.7749,
+          end_lng: -120.4194,
+        },
   });
 
   const onSubmit = async (data: INetworkForm) => {
     const payload = {
       name: data.name,
       description: data.description,
-      coordinates: [data.lat, data.lng],
+      start_coordinates: [data.start_lat, data.start_lng],
+      end_coordinates: [data.end_lat, data.end_lng],
     };
     if (isEditing) {
       await updateNetwork({
@@ -89,7 +97,11 @@ const NetworkForm = ({
             <Plus size={18} /> Add Network
           </button>
         </SheetTrigger>
-        <SheetContent side="right" className="overflow-y-auto z-[99999]">
+        <SheetContent
+          side="right"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          className="overflow-y-auto z-[99999]"
+        >
           <SheetHeader>
             <SheetTitle>
               {isEditing ? "Edit Road Network" : "New Road Network"}
@@ -128,34 +140,74 @@ const NetworkForm = ({
                 className="mt-1 w-full px-3 py-2 font-jakarta border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Latitude
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  {...register("lat", {
-                    required: true,
-                    valueAsNumber: true,
-                  })}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
+            <div className="space-y-1">
+              <p className="block text-sm font-medium text-gray-700">
+                Start Coordinates
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Latitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("start_lat", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Longitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("start_lng", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Longitude
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  {...register("lng", {
-                    required: true,
-                    valueAsNumber: true,
-                  })}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
+            </div>
+            <div className="space-y-1">
+              <p className="block text-sm font-medium text-gray-700">
+                End Coordinates
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Latitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("end_lat", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[14px] font-medium text-gray-700">
+                    Longitude
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    {...register("end_lng", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
               </div>
             </div>
             <SheetFooter>

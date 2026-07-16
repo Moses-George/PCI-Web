@@ -2,7 +2,6 @@
 import type { InferenceEvent } from "@/hooks/useInferenceStatus";
 import type { Image } from "@/types";
 import { useState } from "react";
-import { GridLoader } from "react-spinners";
 
 const SUImages = ({
   images,
@@ -12,7 +11,7 @@ const SUImages = ({
   event: InferenceEvent | null;
 }) => {
   // Track annotated image — may arrive after initial render via WS
-  const [annotatedUrl, setAnnotatedUrl] = useState<string | null>(
+  const [annotatedUrl, _setAnnotatedUrl] = useState<string | null>(
     images?.find((img) => img.is_annotated)?.public_url ?? null,
   );
 

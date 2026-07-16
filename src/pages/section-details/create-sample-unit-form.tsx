@@ -26,6 +26,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { useState } from "react";
+import { names_suggestions } from "@/lib/constants";
+
 
 const VISION_MODELS = ["Segmentation", "Bounding Box"];
 
@@ -34,10 +36,14 @@ const CreateSampleUnitForm = ({
   sectionId,
   refetch,
   onSuccess,
+  refetchSection,
+  num_sample_units,
 }: {
   section: Section | undefined;
   sectionId: string | undefined;
   refetch: any;
+  refetchSection: any;
+  num_sample_units: number;
   onSuccess?: () => void;
 }) => {
   const dispatch = useDispatch();
@@ -62,7 +68,7 @@ const CreateSampleUnitForm = ({
     values: isEditing
       ? { ...selectedSampleUnit }
       : {
-          name: "",
+          name: names_suggestions[num_sample_units] ?? "",
           pixel_to_mm_factor: section?.pixel_to_mm_factor || 0.5,
           distress_type: null,
           severity: null,
@@ -128,7 +134,8 @@ const CreateSampleUnitForm = ({
       }
       reset();
       dispatch(setOpenForm(false));
-      refetch();
+      await refetch();
+      await refetchSection();
       if (!isEditing) setTimeout(() => onSuccess?.(), 300);
       toast.success(`Sample unit ${isEditing ? "updated" : "added"}`);
     } catch (err) {

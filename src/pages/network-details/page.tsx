@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useParams, Link } from "react-router-dom";
 import Spinner from "../../components/common/spinner";
-import MapPreview from "../../components/common/map-preview";
+import MapPreview, {
+  type SectionOverlay,
+} from "../../components/common/map-preview";
 import CreateSectionForm from "./create-section-form";
 import { ArrowRight, Edit, Trash2 } from "lucide-react";
 import { useGetSingleNetworkQuery } from "@/store/api/networksApi";
@@ -14,10 +16,10 @@ import { useDeleteSectionMutation } from "@/store/api/sectionsApi";
 interface ISectionForm {
   name: string;
   description: string;
-  lat: number;
-  lng: number;
-  chainageStart: number;
-  chainageEnd: number;
+  start_lat: number;
+  start_lng: number;
+  end_lat: number;
+  end_lng: number;
   width: number;
   length: number;
   pixelToMmFactor: number;
@@ -62,10 +64,10 @@ const NetworkDetail = () => {
       section: {
         name: section.name,
         description: section.description,
-        lat: section.coordinates[0],
-        lng: section.coordinates[1],
-        chainageStart: section.chainage_start,
-        chainageEnd: section.chainage_end,
+        start_lat: section.start_coordinates[0],
+        start_lng: section.start_coordinates[1],
+        end_lat: section.end_coordinates[0],
+        end_lng: section.end_coordinates[1],
         width: section.width,
         length: section.length,
         pixelToMmFactor: section.pixel_to_mm_factor,
@@ -92,6 +94,30 @@ const NetworkDetail = () => {
     }
   };
 
+  let network_sections_overlay: SectionOverlay[] = [];
+
+  if (network) {
+    network_sections_overlay = network?.sections?.map((section) => {
+      const start_coord: [number, number] = [
+        section.start_coordinates[0],
+        section.start_coordinates[1],
+      ];
+      const end_coord: [number, number] = [
+        section.end_coordinates[0],
+        section.end_coordinates[1],
+      ];
+      return {
+        id: section.id,
+        name: section.name,
+        start: start_coord,
+        end: end_coord,
+        length: section!.length,
+        pci: section.latest_pci ?? 0,
+        condition: section.latest_rating,
+      };
+    });
+  }
+
   if (isLoading || !network)
     return (
       <div className="flex justify-center py-20">
@@ -110,7 +136,7 @@ const NetworkDetail = () => {
           message={`Are you sure you want to delete ${selectedSection.section?.name} Section ? Please note that all sample units in this section will also be deleted permanently. This action cannot be undone`}
         />
       )}
-      <div className="space-y-6 font-jakarta">
+      <div className="space-y-6 font-jakarta max-w-5xl mx-auto">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-2xl font-bold mb-2">{network.name}</h2>
@@ -134,10 +160,11 @@ const NetworkDetail = () => {
             {/* <h4 className="font-medium p-4">Network Location</h4> */}
             <div className="h-[25rem]">
               <MapPreview
-                center={network.coordinates}
-                zoom={11}
+                center={network.start_coordinates}
+                zoom={19}
                 height="100%"
                 className="rounded-b-md h-full"
+                sections={network_sections_overlay}
               />
             </div>
           </div>
@@ -198,62 +225,81 @@ const NetworkDetail = () => {
               <p className="text-gray-400">No sections yet. Add one above.</p>
             </div>
           )}
-          {sections?.map((sec: Section) => (
-            <div
-              key={sec.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200  flex items-center gap-6 hover:shadow-md transition-shadow"
-            >
-              <div className="h-80 flex-1 flex-shrink-0 overflow-hidden rounded-tl-lg rounded-bl-lg ">
-                <MapPreview
-                  center={sec.coordinates}
-                  zoom={14}
-                  height="100%"
-                  className="rounded-tl-lg rounded-bl-lg"
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-semibold">{sec.name}</h4>
-                    <p className="text-sm text-gray-500 line-clamp-1">
-                      {sec.description}
-                    </p>
+          {sections?.map((section: Section) => {
+            const start_coord: [number, number] = [
+              section.start_coordinates[0],
+              section.start_coordinates[1],
+            ];
+            const end_coord: [number, number] = [
+              section.end_coordinates[0],
+              section.end_coordinates[1],
+            ];
+            return (
+              <div
+                key={section.id}
+                className="bg-white rounded-xl shadow-sm border border-gray-200  flex items-center gap-6 hover:shadow-md transition-shadow"
+              >
+                <div className="h-80 flex-1 flex-shrink-0 overflow-hidden rounded-tl-lg rounded-bl-lg ">
+                  <MapPreview
+                    center={section.start_coordinates}
+                    zoom={19}
+                    height="100%"
+                    className="rounded-tl-lg rounded-bl-lg"
+                    sections={[
+                      {
+                        id: section!.id,
+                        name: section!.name,
+                        start: start_coord,
+                        end: end_coord,
+                        length: section!.length,
+                        pci: section!.latest_pci ?? 0,
+                        condition: section!.latest_rating,
+                      },
+                    ]}
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-semibold">{section.name}</h4>
+                      <p className="text-sm text-gray-500 line-clamp-1">
+                        {section.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-1 flex flex-wrap gap-3 text-xs text-gray-400">
-                  <span>Width: {sec.width}m</span>
-                  <span>Length: {sec.length}m</span>
-                  <span>
-                    Chainage: {sec.chainage_start}-{sec.chainage_end}m
-                  </span>
-                  <span>Sample Units: {sec.sample_unit_count}</span>
-                </div>
-                <div className="flex items-center gap-3 font-jakarta mt-5">
-                  <div className="font-bold text-sm">Actions:</div>
-                  <button
-                    onClick={() => handleAction(sec, "delete")}
-                    className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
+                  <div className="mt-1 flex flex-wrap gap-3 text-xs text-gray-400">
+                    <span>Width: {section.width}m</span>
+                    <span>Length: {section.length}m</span>
+                    {/* <span>Chainage: m</span> */}
+                    <span>Sample Units: {section.sample_unit_count}</span>
+                  </div>
+                  <div className="flex items-center gap-3 font-jakarta mt-5">
+                    <div className="font-bold text-sm">Actions:</div>
+                    <button
+                      onClick={() => handleAction(section, "delete")}
+                      className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
+                    >
+                      <Trash2 size={20} color="red" />
+                      <span className="text-sm">Delete</span>
+                    </button>
+                    <button
+                      onClick={() => handleAction(section, "edit")}
+                      className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
+                    >
+                      <Edit size={20} color="blue" />
+                      <span className="text-sm">Edit</span>
+                    </button>
+                  </div>
+                  <Link
+                    to={`/networks/${networkId}/sections/${section.id}`}
+                    className="text-blue-600 hover:underline text-sm mt-4 font-medium flex items-center gap-1"
                   >
-                    <Trash2 size={20} color="red" />
-                    <span className="text-sm">Delete</span>
-                  </button>
-                  <button
-                    onClick={() => handleAction(sec, "edit")}
-                    className="flex items-center gap-2 transform active:scale-75 transition-transform cursor-pointer"
-                  >
-                    <Edit size={20} color="blue" />
-                    <span className="text-sm">Edit</span>
-                  </button>
+                    View <ArrowRight size={16} />
+                  </Link>
                 </div>
-                <Link
-                  to={`/networks/${networkId}/sections/${sec.id}`}
-                  className="text-blue-600 hover:underline text-sm mt-4 font-medium flex items-center gap-1"
-                >
-                  View <ArrowRight size={16} />
-                </Link>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </>

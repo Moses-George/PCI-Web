@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-useless-assignment */
 import React from "react";
 import { maintenanceRules, unitCosts } from "../../constants/dummy";
@@ -14,6 +13,7 @@ const MaintenanceRecommendations: React.FC<MaintenanceRecommendationsProps> = ({
   pci,
   distressTypes,
 }) => {
+  console.log(sectionId)
   // Find matching rule
   const rule = maintenanceRules.find((r) => pci >= r.minPci && pci <= r.maxPci);
   if (!rule)
