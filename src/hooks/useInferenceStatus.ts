@@ -1,4 +1,4 @@
-import { VITE_ENDPOINT_URL } from "@/lib/variables";
+import {  VITE_WS_ENDPOINT_URL } from "@/lib/variables";
 import { useEffect, useRef, useState } from "react";
 
 export type InferenceStep =
@@ -46,7 +46,7 @@ export function useInferenceStatus(
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     const ws = new WebSocket(
-      `wss://${VITE_ENDPOINT_URL}/ws/inference/${sampleUnitId}`
+      `${VITE_WS_ENDPOINT_URL}/ws/inference/${sampleUnitId}`
     );
     wsRef.current = ws;
 
