@@ -1,12 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Network, Section, SampleUnit} from "../../types";
+import { VITE_ENDPOINT_URL } from "@/lib/variables";
 
 
 const isDummy = true; // toggle to false when real backend is ready
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: VITE_ENDPOINT_URL }),
   tagTypes: ["Network", "Section", "SampleUnit", "PCI"],
   endpoints: (builder) => ({
     // Networks

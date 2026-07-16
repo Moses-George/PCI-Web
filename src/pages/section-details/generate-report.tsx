@@ -129,6 +129,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import type { Section } from "@/types";
+import { VITE_ENDPOINT_URL } from "@/lib/variables";
 
 const REPORT_OPTIONS = [
   "PCI Score",
@@ -184,7 +185,7 @@ const GenerateReport = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/sections/${sectionId}/report`,
+        `${VITE_ENDPOINT_URL}/sections/${sectionId}/report`,
         {
           method: "POST",
           headers: {
