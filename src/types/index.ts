@@ -66,7 +66,7 @@ export interface NetworkWithSections extends Network {
 
 export interface Section {
   id: string;
-  networkId: string;
+  network_id: string;
   name: string;
   description: string;
   start_coordinates: [number, number]; // [lat, lng]

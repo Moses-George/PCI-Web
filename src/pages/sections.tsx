@@ -90,7 +90,7 @@ const Sections = () => {
                   </div>
                   <div className="mt-3 flex justify-end">
                     <Link
-                      to={`/networks/${sec.networkId}/sections/${sec.id}`}
+                      to={`/networks/${sec.network_id}/sections/${sec.id}`}
                       className="text-blue-600 hover:underline text-sm font-medium"
                     >
                       View Section →
