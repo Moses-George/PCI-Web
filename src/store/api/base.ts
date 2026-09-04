@@ -10,7 +10,7 @@ export const baseQueryWithAuth = async (
   extraOptions: any,
 ) => {
   const result = await fetchBaseQuery({
-    baseUrl: VITE_ENDPOINT_URL,
+    baseUrl: `${VITE_ENDPOINT_URL}/api`,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
       if (token) headers.set("Authorization", `Bearer ${token}`);
